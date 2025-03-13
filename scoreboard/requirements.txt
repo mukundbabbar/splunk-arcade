@@ -3,4 +3,4 @@ redis>=5.2.1,<6.0.0
 splunk-opentelemetry[all]==1.21.0
 opentelemetry-instrumentation-logging==0.48b0
 opentelemetry-instrumentation-requests==0.48b0
-waitress>=3.0.2,<4.0.0
+uvicorn>=0.34.0
