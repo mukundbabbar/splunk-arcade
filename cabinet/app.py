@@ -1,7 +1,9 @@
 import os
-import uvicorn
+
+from waitress import serve
+
 from src import create_app
 
 if __name__ == "__main__":
     app = create_app()
-    uvicorn.run(app, port=5000, root_path=f"/player/{os.getenv('PLAYER_NAME')}/")
+    serve(app, port=5000, threads=32, connection_limit=1000, backlog=2048, url_prefix=f"/player/{os.getenv('PLAYER_NAME')}/")
