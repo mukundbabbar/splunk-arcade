@@ -32,7 +32,7 @@ COPY requirements.txt requirements.txt
 
 # Install Python dependencies using uv
 RUN uv pip install --system -r requirements.txt && \
-    splunk-py-trace-bootstrap
+    opentelemetry-bootstrap -a install
 
 # Copy the rest of the application code
 COPY . .
