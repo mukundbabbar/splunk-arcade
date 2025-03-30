@@ -285,14 +285,6 @@ def player_deployment_create(player_id: str, observability_realm: str) -> None:
                                 period_seconds=30,
                                 timeout_seconds=5,
                             ),
-                            readiness_probe=client.V1Probe(
-                                http_get=client.V1HTTPGetAction(
-                                    path="/alive", port="http", scheme="HTTP"
-                                ),
-                                success_threshold=1,
-                                failure_threshold=2,
-                                period_seconds=30,
-                                timeout_seconds=5,
                         )
                     ],
                     service_account_name="default",
