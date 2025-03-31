@@ -95,6 +95,7 @@ def player_cloud_job_create(
                                     value=NAMESPACE,
                                 ),
                             ],
+                            command=["entrypoint.apply.sh"],
                         ),
                     ],
                     # so it can get secrets for tfstate

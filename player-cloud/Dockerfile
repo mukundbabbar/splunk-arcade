@@ -19,4 +19,4 @@ COPY entrypoint.destroy.sh /terraform/entrypoint.destroy.sh
 COPY main.tf /terraform/main.tf
 COPY vars.tf /terraform/vars.tf
 
-ENTRYPOINT ["/terraform/entrypoint.apply.sh"]
+#ENTRYPOINT ["/terraform/entrypoint.apply.sh"]
