@@ -129,8 +129,8 @@ def main():
                                         value=NAMESPACE,
                                     ),
                                 ],
-                                entrypoint=["/entrypoint.destroy.sh"],
-                                #command=["/entrypoint.destroy.sh"],
+                                command=["/bin/sh", "-c"],
+                                args=["/entrypoint.destroy.sh"],
                             ),
                         ],
                         # so it can get secrets for tfstate
