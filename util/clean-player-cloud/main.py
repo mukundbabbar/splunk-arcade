@@ -129,7 +129,7 @@ def main():
                                         value=NAMESPACE,
                                     ),
                                 ],
-                                command=["/entrypoint.destroy.sh"],
+                                command=["/terraform/entrypoint.apply.sh"],
                             ),
                         ],
                         # so it can get secrets for tfstate
