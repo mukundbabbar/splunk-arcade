@@ -2,4 +2,4 @@
 
 set -euxo pipefail
 
-splunk-py-trace python app.py
+opentelemetry-instrument python app.py

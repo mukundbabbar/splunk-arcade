@@ -63,7 +63,7 @@ class RegistrationForm(FlaskForm):
         Markup(
             """<a 
                     href="https://www.splunk.com/en_us/legal/splunk-general-terms.html" 
-                    class="text-purple-400 hover:text-purple-500">
+                    class="text-purple-400 hover:text-purple-500" target="_blank">
                 I accept Terms and Conditions
             </a>"""
         ),

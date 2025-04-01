@@ -1,32 +1,22 @@
-FROM debian:bookworm-slim
+# Use the official Terraform image
+FROM hashicorp/terraform:latest
 
-ARG TERRAFORM_VERSION=1.10.5
+# Set working directory
+WORKDIR /terraform
 
-RUN apt-get update && \
-    apt-get install -yq --no-install-recommends \
-            ca-certificates \
-            curl \
-            unzip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apt/archive/*.deb
+RUN apk update && \
+    apk add --no-cache \
+    bash \
+    curl \
+    && rm -rf /var/cache/apk/*
 
-# Determine architecture and download appropriate Terraform binary
-RUN ARCH=$(dpkg --print-architecture) && \
-    case "$ARCH" in \
-      amd64) TF_ARCH="amd64" ;; \
-      arm64) TF_ARCH="arm64" ;; \
-      *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
-    esac && \
-    curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o terraform.zip && \
-    unzip terraform.zip && \
-    chmod +x terraform && \
-    mv terraform /usr/local/bin/terraform && \
-    rm terraform.zip
+COPY providers.tf .
+RUN terraform init -input=false
+RUN rm providers.tf
 
-# Copy necessary Terraform and script files
-COPY entrypoint.apply.sh entrypoint.apply.sh
-COPY entrypoint.destroy.sh entrypoint.destroy.sh
-COPY main.tf main.tf
-COPY vars.tf vars.tf
+COPY entrypoint.apply.sh /terraform/entrypoint.apply.sh
+COPY entrypoint.destroy.sh /terraform/entrypoint.destroy.sh
+COPY main.tf /terraform/main.tf
+COPY vars.tf /terraform/vars.tf
 
-CMD ["/entrypoint.apply.sh"]
+#ENTRYPOINT ["/terraform/entrypoint.apply.sh"]
