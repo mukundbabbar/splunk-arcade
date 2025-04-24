@@ -165,6 +165,102 @@ def get_question(module: str):
     return jsonify(question_content)
 
 
+@routes.route("/question_set/<string:module>", methods=["GET"])
+def get_question_set(module: str):
+    content = requests.get(
+        f"http://{PLAYER_CONTENT_HOST}/quiz/question/{module}",
+        headers={
+            "Player-Name": PLAYER_NAME,
+        },
+    )
+
+    question_content = content.json()
+
+    if question_content.get("link_text") and not question_content.get("link"):
+        # for questions that provide link text but not a specific link we
+        # insert the link we built from tf data + realm info
+        question_content["link"] = FINAL_DASHBOARD_URL
+
+    # TODO temp stuff to make our "question set"
+    import json
+    return jsonify(json.loads("""[
+	{
+	  "is_fixed_position": true,
+	  "source": "static",
+	  "question": "1Which endpoint is the culprit of all of those errors?",
+	  "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
+	  "link": "https://app.us1.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
+	  "choices": [
+	    {
+	      "prompt": "/player_progression",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/record_quiz_scores",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/alive",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/blackhole_sun",
+	      "is_correct": true
+	    }
+	  ]
+	},
+	{
+	  "is_fixed_position": true,
+	  "source": "static",
+	  "question": "2Which endpoint is the culprit of all of those errors?",
+	  "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
+	  "link": "https://app.us1.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
+	  "choices": [
+	    {
+	      "prompt": "/player_progression",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/record_quiz_scores",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/alive",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/blackhole_sun",
+	      "is_correct": true
+	    }
+	  ]
+	},
+		{
+	  "is_fixed_position": true,
+	  "source": "static",
+	  "question": "3Which endpoint is the culprit of all of those errors?",
+	  "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
+	  "link": "https://app.us1.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
+	  "choices": [
+	    {
+	      "prompt": "/player_progression",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/record_quiz_scores",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/alive",
+	      "is_correct": false
+	    },
+	    {
+	      "prompt": "/blackhole_sun",
+	      "is_correct": true
+	    }
+	  ]
+	}
+]"""))
+
 @routes.route("/answer", methods=["POST"])
 def record_answer():
     content = request.get_json(force=True)

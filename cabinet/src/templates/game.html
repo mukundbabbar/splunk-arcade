@@ -52,12 +52,16 @@
             let startTime = null;
             let attemptsCount = 0;
 
-            function unlockQuizQuestion() {
+            function unlockQuizQuestionSet() {
+                // players are prompted with N questions depending on their current state. for
+                // example, when the game version is 0.5 for imvaders, players must answer 3
+                // questions when they lose to unlock the 0.75 version of the game.
                 startTime = new Date().getTime();
 
                 $.ajax({
                     type: 'GET',
-                    url: '{{ url_for("routes.get_question", module=data.title) }}',
+                    // TODO change the route -> get_question_set
+                    url: '{{ url_for("routes.get_question_set", module=data.title) }}',
                     success: function(response) {
                         if (Object.keys(response).length === 0) {
                             console.log("player has seen all questions");
@@ -68,65 +72,157 @@
                             return;
                         }
 
-                        window.questionSource = response.source;
-                        const question = response.question;
-                        const optionsList = document.createElement("ul");
-                        optionsList.classList.add("space-y-2");
+                        let currentQuestionIndex = 0;
 
-                        const options = ['A', 'B', 'C', 'D'];
-                        const randomizedPrompts = [...response.choices].sort(() => Math.random() - 0.5);
-
-                        options.forEach((option, idx) => {
-                            const li = document.createElement("li");
-                            li.classList.add("flex", "items-center");
-
-                            const input = document.createElement("input");
-                            input.type = "radio";
-                            input.name = "quiz-answer";
-                            input.value = randomizedPrompts[idx].prompt;
-                            input.id = `option-${option}`;
-                            input.classList.add("mr-2", "accent-cyan-600");
-
-                            const label = document.createElement("label");
-                            label.setAttribute("for", `option-${option}`);
-                            label.classList.add("text-white", "cursor-pointer");
-                            label.textContent = randomizedPrompts[idx].prompt;
-
-                            li.appendChild(input);
-                            li.appendChild(label);
-                            optionsList.appendChild(li);
-
-                            if (randomizedPrompts[idx].is_correct) {
-                                window.correctAnswer = option;
+                        function showNextQuestion() {
+                            if (currentQuestionIndex >= response.length) {
+                                hideQuizModal();
+                                return;
                             }
-                        });
+                            const question_content = response[currentQuestionIndex];
+                            window.questionSource = question_content.source;
+                            const question = question_content.question;
+                            const optionsList = document.createElement("ul");
+                            optionsList.classList.add("space-y-2");
 
-                        const submitButton = document.createElement("button");
-                        submitButton.textContent = "Submit Answer";
-                        submitButton.classList.add("w-full", "bg-cyan-600", "hover:bg-cyan-700", "text-white", "py-2", "px-4", "rounded-lg", "mt-4");
-                        submitButton.onclick = checkQuestionAnswer;
+                            const options = ['A', 'B', 'C', 'D'];
+                            const randomizedPrompts = [...question_content.choices].sort(() => Math.random() - 0.5);
 
-                        const content = document.createElement("div");
-                        content.classList.add("space-y-4");
-                        content.innerHTML = `<p id="quiz-question" class="text-lg font-medium">${question}</p><hr class="border-gray-600 my-4">`;
+                            options.forEach((option, idx) => {
+                                const li = document.createElement("li");
+                                li.classList.add("flex", "items-center");
 
-                        if (response.link) {
-                            const linkElement = document.createElement("a");
-                            linkElement.href = response.link;
-                            linkElement.target = "_blank";
-                            linkElement.textContent = response.link_text;
-                            linkElement.classList.add("text-cyan-400", "hover:text-cyan-500", "block", "mt-4", "text-center");
-                            content.appendChild(linkElement);
+                                const input = document.createElement("input");
+                                input.type = "radio";
+                                input.name = "quiz-answer";
+                                input.value = randomizedPrompts[idx].prompt;
+                                input.id = `option-${option}`;
+                                input.classList.add("mr-2", "accent-cyan-600");
 
-                            const hrElement = document.createElement("hr");
-                            hrElement.classList.add("border-gray-600", "my-4");
-                            content.appendChild(hrElement);
+                                const label = document.createElement("label");
+                                label.setAttribute("for", `option-${option}`);
+                                label.classList.add("text-white", "cursor-pointer");
+                                label.textContent = randomizedPrompts[idx].prompt;
+
+                                li.appendChild(input);
+                                li.appendChild(label);
+                                optionsList.appendChild(li);
+
+                                if (randomizedPrompts[idx].is_correct) {
+                                    window.correctAnswer = option;
+                                }
+                            });
+
+                            const submitButton = document.createElement("button");
+                            submitButton.textContent = "Submit Answer";
+                            submitButton.classList.add("w-full", "bg-cyan-600", "hover:bg-cyan-700", "text-white", "py-2", "px-4", "rounded-lg", "mt-4");
+                            submitButton.onclick = async function () {
+                                const selectedOption = document.querySelector('input[name="quiz-answer"]:checked');
+                                const quizModal = document.getElementById("quiz-modal");
+                                const quizBackdrop = document.getElementById("quiz-backdrop");
+
+                                if (selectedOption) {
+                                    const selectedAnswer = selectedOption.id.split("-")[1];
+
+                                    attemptsCount++;
+
+                                    if (selectedAnswer === window.correctAnswer) {
+                                        const quizQuestion = document.querySelector("#quiz-question").textContent;
+
+                                        quizModal.remove();
+                                        quizBackdrop.remove();
+
+                                        const endTime = new Date().getTime();
+                                        const timeTaken = (endTime - startTime) / 1000;
+
+                                        await showFeedbackPopup(timeTaken, attemptsCount, quizQuestion);
+
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '{{ url_for("routes.record_answer") }}',
+                                            data: JSON.stringify({
+                                                game_session_id: "{{ gamesession }}",
+                                                player_name: "{{ user_username }}",
+                                                title: "{{ data.title }}",
+                                                question: quizQuestion,
+                                                attempts: attemptsCount,
+                                                time_taken: timeTaken,
+                                                source: window.questionSource
+                                            }),
+                                            contentType: 'application/json',
+                                            success: function(response) {
+                                                console.log('Answer recorded successfully:', response);
+                                            },
+                                            error: function(error) {
+                                                console.log('Error recording answer:', error);
+                                            }
+                                        });
+
+                                        startTime = null;
+                                        attemptsCount = 0;
+
+                                        currentQuestionIndex++;
+                                        showNextQuestion();
+
+                                        return;
+                                    }
+
+                                    const feedbackElement = document.createElement("div");
+                                    feedbackElement.textContent = "Wrong answer. Try again!";
+                                    feedbackElement.classList.add(
+                                        "bg-red-500", "text-white", "absolute", "top-[-120px]", "left-1/2",
+                                        "transform", "-translate-x-1/2", "px-4", "py-2", "text-center",
+                                        "rounded-lg", "shadow-lg", "z-[9999]"
+                                    );
+
+                                    quizModal.appendChild(feedbackElement);
+
+                                    setTimeout(() => {
+                                        feedbackElement.classList.add("opacity-0");
+                                        setTimeout(() => feedbackElement.remove(), 500);
+                                    }, 2000);
+                                } else {
+                                    const feedbackElement = document.createElement("div");
+                                    feedbackElement.textContent = "Please select an answer before submitting.";
+                                    feedbackElement.classList.add(
+                                        "bg-yellow-500", "text-white", "absolute", "top-[-120px]", "left-1/2",
+                                        "transform", "-translate-x-1/2", "px-4", "py-2", "text-center",
+                                        "rounded-lg", "shadow-lg", "z-[9999]"
+                                    );
+
+                                    quizModal.appendChild(feedbackElement);
+
+                                    setTimeout(() => {
+                                        feedbackElement.classList.add("opacity-0");
+                                        setTimeout(() => feedbackElement.remove(), 500);
+                                    }, 2000);
+                                }
+                            };
+
+                            const content = document.createElement("div");
+                            content.classList.add("space-y-4");
+                            content.innerHTML = `<p id="quiz-question" class="text-lg font-medium">${question}</p><hr class="border-gray-600 my-4">`;
+
+                            if (response.link) {
+                                const linkElement = document.createElement("a");
+                                linkElement.href = response.link;
+                                linkElement.target = "_blank";
+                                linkElement.textContent = response.link_text;
+                                linkElement.classList.add("text-cyan-400", "hover:text-cyan-500", "block", "mt-4", "text-center");
+                                content.appendChild(linkElement);
+
+                                const hrElement = document.createElement("hr");
+                                hrElement.classList.add("border-gray-600", "my-4");
+                                content.appendChild(hrElement);
+                            }
+
+                            content.appendChild(optionsList);
+                            content.appendChild(submitButton);
+
+                            showQuizModal(content);
                         }
 
-                        content.appendChild(optionsList);
-                        content.appendChild(submitButton);
-
-                        showQuizModal(content);
+                        showNextQuestion();
                     },
                     error: function(error) {
                         console.log(error);
@@ -161,144 +257,70 @@
                 document.body.appendChild(modal);
             }
 
-            function checkQuestionAnswer() {
-                const selectedOption = document.querySelector('input[name="quiz-answer"]:checked');
-                const quizModal = document.getElementById("quiz-modal");
-                const quizBackdrop = document.getElementById("quiz-backdrop");
-
-                if (selectedOption) {
-                    const selectedAnswer = selectedOption.id.split("-")[1];
-
-                    attemptsCount++;
-
-                    if (selectedAnswer === window.correctAnswer) {
-                        const quizQuestion = document.querySelector("#quiz-question").textContent;
-
-                        quizModal.remove();
-                        quizBackdrop.remove();
-
-                        const endTime = new Date().getTime();
-                        const timeTaken = (endTime - startTime) / 1000;
-
-                        showFeedbackPopup(timeTaken, attemptsCount, quizQuestion);
-
-                        $.ajax({
-                            type: 'POST',
-                            url: '{{ url_for("routes.record_answer") }}',
-                            data: JSON.stringify({
-                                game_session_id: "{{ gamesession }}",
-                                player_name: "{{ user_username }}",
-                                title: "{{ data.title }}",
-                                question: quizQuestion,
-                                attempts: attemptsCount,
-                                time_taken: timeTaken,
-                                source: window.questionSource
-                            }),
-                            contentType: 'application/json',
-                            success: function(response) {
-                                console.log('Answer recorded successfully:', response);
-                            },
-                            error: function(error) {
-                                console.log('Error recording answer:', error);
-                            }
-                        });
-
-                        startTime = null;
-                        attemptsCount = 0;
-
-                        return;
-                    }
-
-                    const feedbackElement = document.createElement("div");
-                    feedbackElement.textContent = "Wrong answer. Try again!";
-                    feedbackElement.classList.add(
-                        "bg-red-500", "text-white", "absolute", "top-[-120px]", "left-1/2",
-                        "transform", "-translate-x-1/2", "px-4", "py-2", "text-center",
-                        "rounded-lg", "shadow-lg", "z-[9999]"
-                    );
-
-                    quizModal.appendChild(feedbackElement);
-
-                    setTimeout(() => {
-                        feedbackElement.classList.add("opacity-0");
-                        setTimeout(() => feedbackElement.remove(), 500);
-                    }, 2000);
-                } else {
-                    const feedbackElement = document.createElement("div");
-                    feedbackElement.textContent = "Please select an answer before submitting.";
-                    feedbackElement.classList.add(
-                        "bg-yellow-500", "text-white", "absolute", "top-[-120px]", "left-1/2",
-                        "transform", "-translate-x-1/2", "px-4", "py-2", "text-center",
-                        "rounded-lg", "shadow-lg", "z-[9999]"
-                    );
-
-                    quizModal.appendChild(feedbackElement);
-
-                    setTimeout(() => {
-                        feedbackElement.classList.add("opacity-0");
-                        setTimeout(() => feedbackElement.remove(), 500);
-                    }, 2000);
-                }
-            }
-
             function showFeedbackPopup(timeTaken, attemptsCount, question) {
-                const feedbackElement = document.createElement("div");
-                feedbackElement.classList.add(
-                    "fixed", "top-1/2", "left-1/2", "transform", "-translate-x-1/2", "-translate-y-1/2",
-                    "px-6", "py-4", "rounded-lg", "transition-all", "duration-300",
-                    "max-w-md", "w-full", "bg-gray-800", "text-white", "shadow-lg",
-                    "space-y-3", "z-50"
-                );
+                return new Promise((resolve) => {
+                    const feedbackElement = document.createElement("div");
+                    feedbackElement.classList.add(
+                        "fixed", "top-1/2", "left-1/2", "transform", "-translate-x-1/2", "-translate-y-1/2",
+                        "px-6", "py-4", "rounded-lg", "transition-all", "duration-300",
+                        "max-w-md", "w-full", "bg-gray-800", "text-white", "shadow-lg",
+                        "space-y-3", "z-50"
+                    );
 
-                feedbackElement.innerHTML = `
+                    feedbackElement.innerHTML = `
         <p class="text-xl font-bold text-center">Correct!</p>
         <p class="text-center">It took you ${timeTaken.toFixed(2)} seconds and ${attemptsCount} attempt(s).</p>
         <p class="text-center">Hey, if you liked this question, give it a thumbs up. If it wasn't so great, give it a thumbs down.</p>
     `;
 
-                const thumbsContainer = document.createElement("div");
-                thumbsContainer.classList.add("flex", "justify-center", "space-x-4");
+                    const thumbsContainer = document.createElement("div");
+                    thumbsContainer.classList.add("flex", "justify-center", "space-x-4");
 
-                const thumbsUpBtn = document.createElement("button");
-                thumbsUpBtn.classList.add("bg-green-600", "text-white", "px-4", "py-2", "rounded-lg", "hover:bg-green-700", "transition");
-                thumbsUpBtn.textContent = "👍";
-                thumbsUpBtn.onclick = function() {
-                    feedbackElement.remove();
-                    backdrop.remove();
-                    sendFeedback(question, true);
-                };
+                    const thumbsUpBtn = document.createElement("button");
+                    thumbsUpBtn.classList.add("bg-green-600", "text-white", "px-4", "py-2", "rounded-lg", "hover:bg-green-700", "transition");
+                    thumbsUpBtn.textContent = "👍";
+                    thumbsUpBtn.onclick = function() {
+                        feedbackElement.remove();
+                        backdrop.remove();
+                        sendFeedback(question, true);
+                        resolve();
+                    };
 
-                const thumbsDownBtn = document.createElement("button");
-                thumbsDownBtn.classList.add("bg-red-600", "text-white", "px-4", "py-2", "rounded-lg", "hover:bg-red-700", "transition");
-                thumbsDownBtn.textContent = "👎";
-                thumbsDownBtn.onclick = function() {
-                    feedbackElement.remove();
-                    backdrop.remove();
-                    sendFeedback(question, false);
-                };
+                    const thumbsDownBtn = document.createElement("button");
+                    thumbsDownBtn.classList.add("bg-red-600", "text-white", "px-4", "py-2", "rounded-lg", "hover:bg-red-700", "transition");
+                    thumbsDownBtn.textContent = "👎";
+                    thumbsDownBtn.onclick = function() {
+                        feedbackElement.remove();
+                        backdrop.remove();
+                        sendFeedback(question, false);
+                        resolve();
+                    };
 
-                thumbsContainer.appendChild(thumbsUpBtn);
-                thumbsContainer.appendChild(thumbsDownBtn);
-                feedbackElement.appendChild(thumbsContainer);
+                    thumbsContainer.appendChild(thumbsUpBtn);
+                    thumbsContainer.appendChild(thumbsDownBtn);
+                    feedbackElement.appendChild(thumbsContainer);
 
-                const closeButton = document.createElement("button");
-                closeButton.textContent = "❌";
-                closeButton.classList.add("absolute", "top-2", "right-2", "text-white", "text-xl", "bg-transparent", "border-none", "cursor-pointer");
+                    const closeButton = document.createElement("button");
+                    closeButton.textContent = "❌";
+                    closeButton.classList.add("absolute", "top-2", "right-2", "text-white", "text-xl", "bg-transparent", "border-none", "cursor-pointer");
 
-                closeButton.onclick = function() {
-                    feedbackElement.remove();
-                    backdrop.remove();
-                };
+                    closeButton.onclick = function() {
+                        feedbackElement.remove();
+                        backdrop.remove();
+                        resolve();
+                    };
 
-                feedbackElement.appendChild(closeButton);
+                    feedbackElement.appendChild(closeButton);
 
-                const backdrop = document.createElement("div");
-                backdrop.classList.add(
-                    "fixed", "top-0", "left-0", "w-full", "h-full", "backdrop-blur-sm", "bg-opacity-30", "z-40"
-                );
+                    const backdrop = document.createElement("div");
+                    backdrop.classList.add(
+                        "fixed", "top-0", "left-0", "w-full", "h-full", "backdrop-blur-sm", "bg-opacity-30", "z-40"
+                    );
 
-                document.body.appendChild(backdrop);
-                document.body.appendChild(feedbackElement);
+                    document.body.appendChild(backdrop);
+                    document.body.appendChild(feedbackElement);
+                })
+
             }
 
             function sendFeedback(question, is_good) {

@@ -29,13 +29,12 @@
       let enemyDirection = 1;
       let enemyDropDistance = 30;
       let enemySpeed = 1;
-      let version = 0.75;
+      let version = "0.5";
       let username = "player" + Math.floor(Math.random() * 100);
       let gameDuration = 0;
       let isDeathAnimating = false;
       let deathAnimationFrame = 0;
       const DEATH_ANIMATION_DURATION = 60; // frames
-      const DEATH_PAUSE_DURATION = 30; // frames
 
       // Add to game state section
       const barriers = [];
@@ -49,16 +48,18 @@
       let lastUfoSpawn = Date.now();  // Tracks time since last UFO spawn
 
       function getVersion() {
-        $.ajax({
-          type: "GET",
-          url: '{{ url_for("routes.get_imvaders_version") }}',
-          success: function (response) {
-            version = response.version;
-          },
-          error: function (error) {
-            console.log("Error determining imvaders version:", error);
-          },
-        });
+        // TODO temp
+        // $.ajax({
+        //   type: "GET",
+        //   url: '{{ url_for("routes.get_imvaders_version") }}',
+        //   success: function (response) {
+        //     version = response.version;
+        //   },
+        //   error: function (error) {
+        //     console.log("Error determining imvaders version:", error);
+        //   },
+        // });
+        version = "0.5";
       }
 
       getVersion();
@@ -69,15 +70,6 @@
         Level: level,
       });
 
-      // TODO! :)
-      // SplunkRum.init({
-      //   realm: "us1",
-      //   rumAccessToken: "FOO",
-      //   applicationName: "imvaders",
-      //   version: version,
-      //   deploymentEnvironment: "gamify",
-      // });
-
       // Player
       const player = {
         x: 375,
@@ -86,14 +78,6 @@
         height: 50,
         speed: 5,
       };
-
-      const alienShipURIs = [
-        "{{ url_for('static', filename='imvaders/a1.png') }}",
-        "{{ url_for('static', filename='imvaders/a2.png') }}",
-        "{{ url_for('static', filename='imvaders/a3.png') }}",
-      ];
-
-
 
       // Convert SVGs to images
       function svgToImage(svgString) {
@@ -110,13 +94,53 @@
         return img;
       }
 
-      const playerShipImg = urlToImage("{{ url_for('static', filename='imvaders/ship2.png') }}");
-      const ufoImg = urlToImage("{{ url_for('static', filename='imvaders/a4.png') }}");
-      const alienShipImgs = alienShipURIs.map(urlToImage);
+      let playerShipImg;
+      let alienShipImgs;
+      let ufoImg;
+
+      if (version === "0.5") {
+        // 0.5 is the "old" less pretty version :)
+        const playerShipSVG = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+            <path fill="#4a90e2" d="M25,2 L10,48 L25,38 L40,48 Z" />
+            <circle fill="#e74c3c" cx="25" cy="20" r="6" />
+        </svg>
+        `;
+
+        const alienShipSVGs = [
+          `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+                <ellipse fill="#8e44ad" cx="25" cy="25" rx="20" ry="10" />
+                <circle fill="#2ecc71" cx="25" cy="25" r="5" />
+                <rect fill="#8e44ad" x="5" y="20" width="40" height="10" />
+            </svg>`,
+          `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+                <path fill="#e67e22" d="M10,25 Q25,5 40,25 Q25,45 10,25 Z" />
+                <circle fill="#3498db" cx="25" cy="25" r="5" />
+            </svg>`,
+          `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+                <rect fill="#c0392b" x="10" y="20" width="30" height="20" rx="10" ry="10" />
+                <circle fill="#f1c40f" cx="20" cy="30" r="3" />
+                <circle fill="#f1c40f" cx="30" cy="30" r="3" />
+            </svg>`,
+        ];
+
+        playerShipImg = svgToImage(playerShipSVG);
+        alienShipImgs = alienShipSVGs.map(svgToImage);
+      } else {
+        // anything else means the fancier flavor
+        const alienShipURIs = [
+          "{{ url_for('static', filename='imvaders/a1.png') }}",
+          "{{ url_for('static', filename='imvaders/a2.png') }}",
+          "{{ url_for('static', filename='imvaders/a3.png') }}",
+        ];
+
+        playerShipImg = urlToImage("{{ url_for('static', filename='imvaders/ship2.png') }}");
+        alienShipImgs = alienShipURIs.map(urlToImage);
+        ufoImg = urlToImage("{{ url_for('static', filename='imvaders/a4.png') }}");
+      }
 
       // Stars
       const stars = [];
-      const numStars = 100;
 
       // Enemies
       const enemies = [];
@@ -297,9 +321,13 @@
         }
       }
 
-          // Check collision between point and barrier
+      // Check collision between point and barrier
       function checkBarrierCollision(x, y) {
-          for (let barrier of barriers) {
+        if (version === "0.75") {
+          return;
+        }
+
+        for (let barrier of barriers) {
             if (
               x >= barrier.x &&
               x < barrier.x + barrier.width &&
@@ -341,8 +369,8 @@
                 }
 
                 // Play explosion sound for dramatic effect
-                //explosionSound.currentTime = 0;
-                //explosionSound.play();
+                explosionSound.currentTime = 0;
+                explosionSound.play();
               }
             });
           });
@@ -382,7 +410,8 @@
       }
 
       function drawUFO() {
-        if (!ufo) return;
+        // no ufo in 0.5 the "old" more basic version
+        if (!ufo || version === "0.5") return;
         ctx.drawImage(ufoImg, ufo.x, ufo.y, ufo.width, ufo.height);
       }
 
@@ -544,8 +573,9 @@
 
             if (lives <= 0) {
               gameOver = true;
-              // unlock a question so they can advance to not slow version w/out having to win
-              unlockQuizQuestion();
+
+              unlockQuizQuestionSet();
+
               postState();
             }
           }
@@ -657,7 +687,6 @@
         levelUpSound.currentTime = 0;
         levelUpSound.play();
         levelUpPause = true;
-        unlockQuizQuestion();
       }
 
       let isMuted = true;
@@ -880,7 +909,6 @@
 
         checkEnemyBarrierCollisions();
 
-        // Enemy shooting
         enemyShoot();
 
         drawBarriers();
@@ -916,8 +944,8 @@
       document.addEventListener("keydown", (e) => {
         keys[e.code] = true;
         if (e.code === "Space") {
-          if (version < 1) {
-            // when on version <1 we only allow shooting one bullet at a time! :)
+          if (version === "0.75") {
+            // when on version 0.75 we only allow shooting one bullet at a time! :)
             if (bullets.length < 1) {
               shoot();
             }
@@ -934,11 +962,17 @@
           });
 
           // Start the game loop when all images are loaded
-          Promise.all([
+          let image_load_promises = [
             playerShipImg.decode(),
             ...alienShipImgs.map((img) => img.decode()),
-            ufoImg.decode()
-          ])
+          ]
+
+          if (version !== "0.5") {
+            // the cool ufo guy is only available in the updated versions
+            image_load_promises.push(ufoImg.decode());
+          }
+
+          Promise.all(image_load_promises)
             .then(() => {
               gameLoop();
             })
