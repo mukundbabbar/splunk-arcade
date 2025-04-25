@@ -47,19 +47,17 @@
       let ufo = null;  // Will store the UFO object when active
       let lastUfoSpawn = Date.now();  // Tracks time since last UFO spawn
 
-      function getVersion() {
-        // TODO temp
-        // $.ajax({
-        //   type: "GET",
-        //   url: '{{ url_for("routes.get_imvaders_version") }}',
-        //   success: function (response) {
-        //     version = response.version;
-        //   },
-        //   error: function (error) {
-        //     console.log("Error determining imvaders version:", error);
-        //   },
-        // });
-        version = "0.5";
+      async function getVersion() {
+        try {
+          const response = await fetch('{{ url_for("routes.get_imvaders_version") }}');
+          const data = await response.json();
+          version = data.version;  // Update version
+          console.log("Fetched version:", version);
+          return version;
+        } catch (error) {
+          console.log("Error determining imvaders version:", error);
+          return version;  // Return default version if error occurs
+        }
       }
 
       getVersion();
@@ -68,7 +66,14 @@
         Score: score,
         Lives: lives,
         Level: level,
+        Version: version,
       });
+
+      const question_counts = {
+        "0.5": 3,
+        "0.75": 3,
+        "1.0": 3,
+      }
 
       // Player
       const player = {
@@ -83,8 +88,7 @@
       function svgToImage(svgString) {
         const img = new Image();
         const svg = new Blob([svgString], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(svg);
-        img.src = url;
+        img.src = URL.createObjectURL(svg);
         return img;
       }
 
@@ -98,6 +102,7 @@
       let alienShipImgs;
       let ufoImg;
 
+      console.log("VERSION", version);
       if (version === "0.5") {
         // 0.5 is the "old" less pretty version :)
         const playerShipSVG = `
@@ -136,6 +141,7 @@
 
         playerShipImg = urlToImage("{{ url_for('static', filename='imvaders/ship2.png') }}");
         alienShipImgs = alienShipURIs.map(urlToImage);
+        console.log("STTING UFO IMG");
         ufoImg = urlToImage("{{ url_for('static', filename='imvaders/a4.png') }}");
       }
 
@@ -379,7 +385,7 @@
       function spawnUFO() {
         const direction = Math.random() < 0.5 ? 1 : -1;  // Randomly choose direction
         const startX = direction === 1 ? -50 : canvas.width + 50;  // Start off-screen
-      
+
         ufo = {
           x: startX,
           y: 30,
@@ -403,7 +409,7 @@
         ufo.x += ufo.speed;
 
         // Remove UFO if it goes off screen
-        if ((ufo.speed > 0 && ufo.x > canvas.width + 50) || 
+        if ((ufo.speed > 0 && ufo.x > canvas.width + 50) ||
             (ufo.speed < 0 && ufo.x < -50)) {
           ufo = null;
         }
@@ -412,6 +418,7 @@
       function drawUFO() {
         // no ufo in 0.5 the "old" more basic version
         if (!ufo || version === "0.5") return;
+        console.log("DRAW UFO");
         ctx.drawImage(ufoImg, ufo.x, ufo.y, ufo.width, ufo.height);
       }
 
@@ -480,7 +487,7 @@
           }
 
           // Check UFO collision
-          if (ufo && 
+          if (ufo &&
               bullet.x < ufo.x + ufo.width &&
               bullet.x + bullet.width > ufo.x &&
               bullet.y < ufo.y + ufo.height &&
@@ -498,7 +505,7 @@
             return;
           }
 
-          // Check barrier collision 
+          // Check barrier collision
           if (checkBarrierCollision(bullet.x + bullet.width / 2, bullet.y)) {
             bullets.splice(index, 1);
             return;
@@ -574,7 +581,7 @@
             if (lives <= 0) {
               gameOver = true;
 
-              unlockQuizQuestionSet();
+              unlockQuizQuestions(question_counts[version]);
 
               postState();
             }
@@ -583,7 +590,7 @@
       }
 
       function drawScore(data) {
-        const text = `score: ${data.Score} | lives: ${data.Lives} | level: ${data.Level}`;
+        const text = `score: ${data.Score} | lives: ${data.Lives} | level: ${data.Level} | ver: ${data.version}`;
         const startX = canvas.width / 2;
         const startY = 15;
         ctx.fillStyle = "white";
@@ -901,8 +908,6 @@
           if (enemy.y + enemy.height >= player.y) {
             gameOver = true;
 
-            // unlock a question so they can advance to not slow version w/out having to win
-            unlockQuizQuestion();
             postState();
           }
         });
@@ -961,24 +966,24 @@
             keys[e.code] = false;
           });
 
-          // Start the game loop when all images are loaded
-          let image_load_promises = [
-            playerShipImg.decode(),
-            ...alienShipImgs.map((img) => img.decode()),
-          ]
+      // Start the game loop when all images are loaded
+      let image_load_promises = [
+        playerShipImg.decode(),
+        ...alienShipImgs.map((img) => img.decode()),
+      ]
 
-          if (version !== "0.5") {
-            // the cool ufo guy is only available in the updated versions
-            image_load_promises.push(ufoImg.decode());
-          }
+      if (version !== "0.5") {
+        // the cool ufo guy is only available in the updated versions
+        image_load_promises.push(ufoImg.decode());
+      }
 
-          Promise.all(image_load_promises)
-            .then(() => {
-              gameLoop();
-            })
-            .catch((err) => {
-              console.error("Error loading images:", err);
-            });
+      Promise.all(image_load_promises)
+        .then(() => {
+          gameLoop();
+        })
+        .catch((err) => {
+          console.error("Error loading images:", err);
+        });
     </script>
   </body>
 </html>

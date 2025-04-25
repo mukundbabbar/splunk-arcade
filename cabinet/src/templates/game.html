@@ -7,6 +7,7 @@
 
         <script>
             window.addEventListener('gameStateChanged', (event) => {
+                console.log("game state changed", event, event.detail);
                 const { gameId } = event.detail;
 
                 const main = document.getElementById("game-container");
@@ -52,16 +53,18 @@
             let startTime = null;
             let attemptsCount = 0;
 
-            function unlockQuizQuestionSet() {
-                // players are prompted with N questions depending on their current state. for
+            function unlockQuizQuestions(count) {
+                // players are prompted with count questions depending on their current state. for
                 // example, when the game version is 0.5 for imvaders, players must answer 3
                 // questions when they lose to unlock the 0.75 version of the game.
                 startTime = new Date().getTime();
+                const baseUrl = "{{ url_for('routes.get_questions', module=data.title, question_count=1) }}";
+                const url = baseUrl.slice(0, -2) + count;
+                console.log("URL>>>>", url);
 
                 $.ajax({
                     type: 'GET',
-                    // TODO change the route -> get_question_set
-                    url: '{{ url_for("routes.get_question_set", module=data.title) }}',
+                    url: url,
                     success: function(response) {
                         if (Object.keys(response).length === 0) {
                             console.log("player has seen all questions");
@@ -75,8 +78,7 @@
                         let currentQuestionIndex = 0;
 
                         function showNextQuestion() {
-                            if (currentQuestionIndex >= response.length) {
-                                hideQuizModal();
+                            if (currentQuestionIndex >= count) {
                                 return;
                             }
                             const question_content = response[currentQuestionIndex];

@@ -18,9 +18,9 @@ def alive():
     return JSONResponse(content={"success": True})
 
 
-@router.get("/quiz/question/{module}")
-async def get_question(
-    module: str, player_name: Annotated[str | None, Header()] = None
+@router.get("/quiz/questions/{module}/{question_count}")
+async def get_questions(
+    module: str, question_count: int, player_name: Annotated[str | None, Header()] = None
 ) -> JSONResponse:
     seen_questions_resp = requests.get(
         f"http://{SCOREBOARD_HOST}/player_seen_questions/{module}",
@@ -30,8 +30,9 @@ async def get_question(
 
     q = _Questions()
     return JSONResponse(
-        content=q.random_question_for_module(
+        content=q.questions_for_module(
             module=module,
+            question_count=question_count,
             seen_questions=seen_questions,
             player_name=player_name,
         )
