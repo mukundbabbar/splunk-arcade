@@ -27,8 +27,6 @@ from opentelemetry import trace
 from src.cluster import (
     APP_NAME,
     ARCADE_HOST,
-    player_cloud_job_complete,
-    player_cloud_job_create,
     player_deployment_create,
     player_deployment_ready,
 )
@@ -155,14 +153,6 @@ def logout():
 
 
 def _register(player_id: str):
-    if SPLUNK_OBSERVABILITY_API_ACCESS_TOKEN != "REPLACE_ME":
-        player_cloud_job_completed = player_cloud_job_complete(
-            player_id=player_id,
-        )
-        print(
-            f"player {player_id} cloud job (tf chart creation) state: {player_cloud_job_completed}"
-        )
-
     player_deployment_create(
         player_id=player_id,
         observability_realm=SPLUNK_OBSERVABILITY_REALM,
@@ -188,21 +178,6 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-
-        # create the player's job (that creates its charts in o11y cloud) and their deployment
-        if SPLUNK_OBSERVABILITY_API_ACCESS_TOKEN == "REPLACE_ME":
-            print("observability api token unset, skipping cloud job create...")
-        else:
-            player_cloud_job_create(
-                player_id=form.username.data,
-                observability_token=SPLUNK_OBSERVABILITY_API_ACCESS_TOKEN,
-                observability_realm=SPLUNK_OBSERVABILITY_REALM,
-            )
-
-            print(
-                f"player {form.username.data} cloud job created, "
-                "spawning background thread to wait and create cabinet deployment..."
-            )
 
         executor = ThreadPoolExecutor(max_workers=1)
         executor.submit(_register, form.username.data)
