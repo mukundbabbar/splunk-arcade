@@ -20,7 +20,7 @@ GAME_VERSIONS = {
         (0, "0.5"),
         (3, "0.75"),
         (6, "1.0"),
-    ]
+    ],
 }
 
 
@@ -185,9 +185,7 @@ def get_player_progression():
                 if idx == len(GAME_VERSIONS[module]) - 1:
                     progression["level_state"][modules[index + 1]] = "unlocked"
 
-    if (
-        progression["level_state"]["bughunt"] == "unlocked"
-    ):
+    if progression["level_state"]["bughunt"] == "unlocked":
         # if they unlocked bughunt we unlock everything
         progression["level_state"]["doom"] = "unlocked"
         progression["level_state"]["floppybird"] = "unlocked"

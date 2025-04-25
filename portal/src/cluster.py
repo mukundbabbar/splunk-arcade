@@ -1,5 +1,4 @@
 import os
-import time
 
 from kubernetes import client, config
 

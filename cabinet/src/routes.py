@@ -28,6 +28,7 @@ UNPROCESSABLE_ENTITY = 422
 def _realmify_dashboard_url(url: str) -> str:
     return url.replace("app.signalfx.com", f"app.{SPLUNK_OBSERVABILITY_REALM}.signalfx.com")
 
+
 FINAL_DASHBOARD_URL = _realmify_dashboard_url(
     os.getenv("dashboard_url", "https://app.signalfx.com/#/dashboard/"),
 )
@@ -145,6 +146,7 @@ def record_game_score():
 
     return {}
 
+
 @routes.route("/question_set/<string:module>/<int:question_count>/", methods=["GET"])
 def get_questions(module: str, question_count: int):
     content = requests.get(
@@ -155,6 +157,7 @@ def get_questions(module: str, question_count: int):
     )
     # TODO we used to do some other check for dashboard link but i think we dont need anymore?
     return content.json()
+
 
 @routes.route("/answer", methods=["POST"])
 def record_answer():

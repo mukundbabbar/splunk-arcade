@@ -1,6 +1,6 @@
 import json
 import os
-from random import choice, randint, random
+from random import randint
 
 from redis import StrictRedis
 
@@ -27,8 +27,8 @@ class _Questions:
             decode_responses=True,
         )
 
-    def questions_for_module(
-            self, module: str, question_count: int, seen_questions: list[str], player_name: str
+    def questions_for_module(  # noqa: C901
+        self, module: str, question_count: int, seen_questions: list[str], player_name: str
     ) -> list[dict]:
         _module = module.lower()
 
@@ -41,11 +41,20 @@ class _Questions:
         out_questions = []
 
         while True:
+            maybe_question = None
+
             if (len(seen_questions) + fixed_counter) < len(fixed_questions):
                 maybe_question = fixed_questions[len(seen_questions) + fixed_counter]
                 fixed_counter += 1
-            else:
-                maybe_question = self.content[module]["other"][randint(0, len(self.content[module]) - 1)]
+            elif (len(seen_questions) + len(out_questions)) < len(fixed_questions) + len(
+                self.content[module]["other"]
+            ):
+                while True:
+                    maybe_question = self.content[module]["other"][
+                        randint(0, len(self.content[module]) - 1)
+                    ]
+                    if maybe_question["question"] not in seen_questions:
+                        break
 
             if maybe_question and maybe_question["question"] not in seen_questions:
                 maybe_question["question"] = maybe_question["question"].replace(

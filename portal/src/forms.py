@@ -21,6 +21,7 @@ def rfc1123(_, field):
             "\tmust start and end with an alphanumeric character"
         )
 
+
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
