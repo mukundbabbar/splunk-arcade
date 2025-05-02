@@ -54,13 +54,13 @@
             let attemptsCount = 0;
 
             function unlockQuizQuestions(count) {
+                window.blockingModalOpen = true;
                 // players are prompted with count questions depending on their current state. for
                 // example, when the game version is 0.5 for imvaders, players must answer 3
                 // questions when they lose to unlock the 0.75 version of the game.
                 startTime = new Date().getTime();
                 const baseUrl = "{{ url_for('routes.get_questions', module=data.title, question_count=1) }}";
                 const url = baseUrl.slice(0, -2) + count;
-                console.log("URL>>>>", url);
 
                 $.ajax({
                     type: 'GET',
@@ -133,6 +133,7 @@
 
                                         quizModal.remove();
                                         quizBackdrop.remove();
+                                        window.blockingModalOpen = false;
 
                                         const endTime = new Date().getTime();
                                         const timeTaken = (endTime - startTime) / 1000;
@@ -248,6 +249,7 @@
                 closeButton.onclick = () => {
                     modal.remove();
                     backdrop.remove();
+                    window.blockingModalOpen = false;
                 };
                 modal.appendChild(closeButton);
 

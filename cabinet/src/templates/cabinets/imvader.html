@@ -595,7 +595,7 @@
         }
 
         function drawScore(data) {
-          const text = `score: ${data.Score} | lives: ${data.Lives} | level: ${data.Level} | ver: ${data.version}`;
+          const text = `score: ${data.Score} | lives: ${data.Lives} | level: ${data.Level} | ver: ${data.Version}`;
           const startX = canvas.width / 2;
           const startY = 15;
           ctx.fillStyle = "white";
@@ -830,6 +830,7 @@
             Score: score,
             Lives: lives,
             Level: level,
+            Version: version,
           });
 
           // Update and draw stars
@@ -937,6 +938,8 @@
 
         // Event listeners
         document.addEventListener("keydown", (e) => {
+          if (window.blockingModalOpen === true) return;
+
           keys[e.code] = true;
           if (e.code === "Space") {
             if (version === "0.75") {
@@ -953,6 +956,8 @@
           }
         });
         document.addEventListener("keyup", (e) => {
+          if (window.blockingModalOpen === true) return;
+
           keys[e.code] = false;
         });
 
