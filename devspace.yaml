@@ -46,7 +46,6 @@ vars:
   SCOREBOARD_IMAGE: ${SPLUNK_ARCADE_REGISTRY}/scoreboard
   PORTAL_IMAGE: ${SPLUNK_ARCADE_REGISTRY}/portal
   PLAYER_CONTENT_IMAGE: ${SPLUNK_ARCADE_REGISTRY}/player-content
-  PLAYER_CLOUD_IMAGE: ${SPLUNK_ARCADE_REGISTRY}/player-cloud
   PLAYER_ROUTER_IMAGE: ${SPLUNK_ARCADE_REGISTRY}/player-router
   PY_IMAGE_DEV: ${SPLUNK_ARCADE_REGISTRY}/py-dev
   GO_IMAGE_DEV: ${SPLUNK_ARCADE_REGISTRY}/go-dev
@@ -116,16 +115,6 @@ images:
       - latest
       - ${COMMIT_HASH}
 
-  player-cloud:
-    createPullSecret: false
-    image: ${PLAYER_CLOUD_IMAGE}
-    context: ./player-cloud
-    dockerfile: ./player-cloud/Dockerfile
-    rebuildStrategy: ignoreContextChanges
-    tags:
-      - latest
-      - ${COMMIT_HASH}
-
   player-router:
     createPullSecret: false
     image: ${PLAYER_ROUTER_IMAGE}
@@ -168,9 +157,6 @@ deployments:
         playerRouter:
           image: ${PLAYER_ROUTER_IMAGE}
           imagePullPolicy: ${IMAGE_PULL_POLICY}
-        playerCloud:
-          image: ${PLAYER_CLOUD_IMAGE}
-          imagePullPolicy: ${IMAGE_PULL_POLICY}
 
 dev:
   splunk-arcade:
@@ -198,7 +184,7 @@ profiles:
       # prod host + tls ofc
       - op: add
         path: deployments.splunk-arcade.helm.values.arcadeHost
-        value: www.splunkarcade.com
+        value: us.splunkarcade.com
       - op: add
         path: deployments.splunk-arcade.helm.values.tls
         value:
@@ -262,8 +248,6 @@ profiles:
             # sizes)
             resourcesPreset: "medium"
 
-  # note: does *not* run player-cloud things (at least rn) meaning there will be no charts
-  # setup via tf, and no correct links to them
   - name: dev-cabinet
     patches:
       - op: add
@@ -370,20 +354,13 @@ pipelines:
   deploy:
     run: |
       run_dependencies --all
-      build_images cabinet scoreboard portal player-content player-cloud player-router
+      build_images cabinet scoreboard portal player-content player-router
       create_deployments --all
 
   # override the default purge pipeline so we can nuke registry and all sorts of other fun stuff
   purge:
     run: |-
-      bash -c util/purge_token_check.sh
       stop_dev --all
-      # must be done prior to cleaning service account! hence why not || true as well!
-      APP_NAME=splunk-arcade \
-        NAMESPACE=${DEVSPACE_NAMESPACE} \
-        SPLUNK_OBSERVABILITY_REALM=${SPLUNK_ARCADE_OBSERVABILITY_REALM} \
-        SPLUNK_OBSERVABILITY_API_ACCESS_TOKEN=${SPLUNK_ARCADE_OBSERVABILITY_API_ACCESS_TOKEN} \
-        venv/bin/python util/clean-player-cloud/main.py
       purge_deployments --all
       kubectl delete deployments -n ${DEVSPACE_NAMESPACE} registry || true
       kubectl delete statefulsets -n ${DEVSPACE_NAMESPACE} registry || true

@@ -1080,7 +1080,7 @@
                             // Write the text center aligned within the <canvas> and at the 9th row position
                             // from the top of the game board
                             pauseLoop = true;
-                            unlockQuizQuestion();
+                            unlockQuizQuestions(3);
 
                             const text = "GAME OVER!\nPress C to Continue";
 
@@ -1121,7 +1121,7 @@
                             Frogger.foregroundDrawingSurface.fillText("YOU WIN!", Frogger.drawingSurfaceWidth / 2, _gameBoard.rows[8]);
 
                             pauseLoop = true;
-                            unlockQuizQuestion();
+                            unlockQuizQuestions(3);
 
                             const text = "YOU WIN!\nPress C to Play Again";
 

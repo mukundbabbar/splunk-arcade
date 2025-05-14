@@ -109,8 +109,6 @@ spec:
               value: "{{ $.Values.observabilityApiAccessToken }}"
             - name: PLAYER_CABINET_IMAGE
               value: "{{ $.Values.cabinet.image }}"
-            - name: PLAYER_CLOUD_IMAGE
-              value: "{{ $.Values.playerCloud.image }}"
             # for pull we'll just do whatever cabinet is (even for the cloud job)
             - name: IMAGE_PULL_POLICY
               value: "{{ $.Values.cabinet.imagePullPolicy }}"

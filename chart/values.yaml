@@ -143,9 +143,5 @@ playerContent:
       memory: 512Mi
       cpu: 500m
 
-playerCloud:
-  image: splunk-arcade/player-cloud:latest
-  imagePullPolicy: Always
-
 # only used for dev on cabinet, otherwise spawn player cabinets via registration portal
 players: []

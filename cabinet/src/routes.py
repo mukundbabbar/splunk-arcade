@@ -21,12 +21,13 @@ SCOREBOARD_HOST = os.getenv("SCOREBOARD_HOST")
 PLAYER_CONTENT_HOST = os.getenv("PLAYER_CONTENT_HOST")
 SPLUNK_OBSERVABILITY_REALM = os.getenv("SPLUNK_OBSERVABILITY_REALM", "us1")
 
-IMVADERS_SLOW_VERSION = 0.75
+IMVADERS_SLOW_VERSION = "0.75"
 UNPROCESSABLE_ENTITY = 422
 
 
 def _realmify_dashboard_url(url: str) -> str:
     return url.replace("app.signalfx.com", f"app.{SPLUNK_OBSERVABILITY_REALM}.signalfx.com")
+
 
 FINAL_DASHBOARD_URL = _realmify_dashboard_url(
     os.getenv("dashboard_url", "https://app.signalfx.com/#/dashboard/"),
@@ -146,23 +147,16 @@ def record_game_score():
     return {}
 
 
-@routes.route("/question/<string:module>", methods=["GET"])
-def get_question(module: str):
+@routes.route("/question_set/<string:module>/<int:question_count>/", methods=["GET"])
+def get_questions(module: str, question_count: int):
     content = requests.get(
-        f"http://{PLAYER_CONTENT_HOST}/quiz/question/{module}",
+        f"http://{PLAYER_CONTENT_HOST}/quiz/questions/{module}/{question_count}",
         headers={
             "Player-Name": PLAYER_NAME,
         },
     )
-
-    question_content = content.json()
-
-    if question_content.get("link_text") and not question_content.get("link"):
-        # for questions that provide link text but not a specific link we
-        # insert the link we built from tf data + realm info
-        question_content["link"] = FINAL_DASHBOARD_URL
-
-    return jsonify(question_content)
+    # TODO we used to do some other check for dashboard link but i think we dont need anymore?
+    return content.json()
 
 
 @routes.route("/answer", methods=["POST"])

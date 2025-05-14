@@ -16,305 +16,344 @@
         window.soundVolume = 0;
       }
 
-      const canvas = document.getElementById("gameCanvas");
-      const ctx = canvas.getContext("2d");
+      let version = "0.5";
 
-      // Game state
-      let intervalID;
-      let score = 0;
-      let lives = 3;
-      let level = 1;
-      let gameOver = false;
-      let levelUpPause = false;
-      let enemyDirection = 1;
-      let enemyDropDistance = 30;
-      let enemySpeed = 1;
-      let version = 0.75;
-      let username = "player" + Math.floor(Math.random() * 100);
-      let gameDuration = 0;
-      let isDeathAnimating = false;
-      let deathAnimationFrame = 0;
-      const DEATH_ANIMATION_DURATION = 60; // frames
-      const DEATH_PAUSE_DURATION = 30; // frames
+      async function getVersion() {
+        try {
+          const response = await fetch('{{ url_for("routes.get_imvaders_version") }}');
+          const data = await response.json();
+          version = data.version;
+          console.log("current version:", version);
+          return version;
+        } catch (error) {
+          console.log("error determining imvaders version:", error);
+          return version;
+        }
+      }
 
-      // Add to game state section
-      const barriers = [];
-      const BARRIER_COUNT = 4;
-      const BARRIER_WIDTH = 60;
-      const BARRIER_HEIGHT = 40;
-      const BARRIER_RESOLUTION = 2; // Size of destructible pixels
-      const BARRIER_Y = 450; // Vertical position of barriers
+      async function main() {
+        await getVersion();
+        run();
+      }
 
-      let ufo = null;  // Will store the UFO object when active
-      let lastUfoSpawn = Date.now();  // Tracks time since last UFO spawn
+      function run() {
 
-      function getVersion() {
-        $.ajax({
-          type: "GET",
-          url: '{{ url_for("routes.get_imvaders_version") }}',
-          success: function (response) {
-            version = response.version;
-          },
-          error: function (error) {
-            console.log("Error determining imvaders version:", error);
-          },
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Game state
+        let intervalID;
+        let score = 0;
+        let lives = 3;
+        let level = 1;
+        let gameOver = false;
+        let levelUpPause = false;
+        let enemyDirection = 1;
+        let enemyDropDistance = 30;
+        let enemySpeed = 1;
+        let username = "player" + Math.floor(Math.random() * 100);
+        let gameDuration = 0;
+        let isDeathAnimating = false;
+        let deathAnimationFrame = 0;
+        const DEATH_ANIMATION_DURATION = 60; // frames
+
+        // Add to game state section
+        const barriers = [];
+        const BARRIER_COUNT = 4;
+        const BARRIER_WIDTH = 60;
+        const BARRIER_HEIGHT = 40;
+        const BARRIER_RESOLUTION = 2; // Size of destructible pixels
+        const BARRIER_Y = 450; // Vertical position of barriers
+
+        let ufo = null;  // Will store the UFO object when active
+        let lastUfoSpawn = Date.now();  // Tracks time since last UFO spawn
+
+        drawScore({
+          Score: score,
+          Lives: lives,
+          Level: level,
+          Version: version,
         });
-      }
 
-      getVersion();
+        const question_counts = {
+          "0.5": 3,
+          "0.75": 3,
+          "1.0": 3,
+        }
 
-      drawScore({
-        Score: score,
-        Lives: lives,
-        Level: level,
-      });
-
-      // TODO! :)
-      // SplunkRum.init({
-      //   realm: "us1",
-      //   rumAccessToken: "FOO",
-      //   applicationName: "imvaders",
-      //   version: version,
-      //   deploymentEnvironment: "gamify",
-      // });
-
-      // Player
-      const player = {
-        x: 375,
-        y: 530,
-        width: 50,
-        height: 50,
-        speed: 5,
-      };
-
-      const alienShipURIs = [
-        "{{ url_for('static', filename='imvaders/a1.png') }}",
-        "{{ url_for('static', filename='imvaders/a2.png') }}",
-        "{{ url_for('static', filename='imvaders/a3.png') }}",
-      ];
-
-
-
-      // Convert SVGs to images
-      function svgToImage(svgString) {
-        const img = new Image();
-        const svg = new Blob([svgString], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(svg);
-        img.src = url;
-        return img;
-      }
-
-      function urlToImage(src) {
-        const img = new Image();
-        img.src = src;
-        return img;
-      }
-
-      const playerShipImg = urlToImage("{{ url_for('static', filename='imvaders/ship2.png') }}");
-      const ufoImg = urlToImage("{{ url_for('static', filename='imvaders/a4.png') }}");
-      const alienShipImgs = alienShipURIs.map(urlToImage);
-
-      // Stars
-      const stars = [];
-      const numStars = 100;
-
-      // Enemies
-      const enemies = [];
-      const enemyRows = 5;
-      const enemyCols = 10;
-      const enemyWidth = 40;
-      const enemyHeight = 40;
-      const enemyPadding = 10;
-
-      // Bullets
-      const bullets = [];
-      const enemyBullets = [];
-      const bulletWidth = 3;
-      const bulletHeight = 10;
-      const bulletSpeed = 7;
-
-      // Sounds
-      const shootSound = new Audio(
-        "{{ url_for('static', filename='imvaders/laser.mp3') }}"
-      );
-      const explosionSound = new Audio(
-        "{{ url_for('static', filename='imvaders/explode.mp3') }}"
-      );
-      const playerHitSound = new Audio(
-        "{{ url_for('static', filename='imvaders/glitch.wav') }}"
-      );
-      const levelUpSound = new Audio(
-        "https://assets.mixkit.co/active_storage/sfx/220/220-preview.mp3"
-      );
-
-      shootSound.volume = 0;
-      explosionSound.volume = 0;
-      playerHitSound.volume = 0;
-      levelUpSound.volume = 0;
-
-      function postState() {
-        if (!gameOver) gameDuration += 2;
-        dict = {
-          game_session_id: "{{ gamesession }}",
-          title: "imvaders",
-          player_name: "{{ user_username }}",
-          player_id: "{{ user_uuid }}",
-          active: !gameOver,
-          level: level,
-          lives_remaining: lives,
-          current_score: score,
-          position: [player.x, player.y],
-          projectiles: bullets.length,
-          duration: gameDuration,
-          version: version,
+        // Player
+        const player = {
+          x: 375,
+          y: 530,
+          width: 50,
+          height: 50,
+          speed: 5,
         };
 
-        $.ajax({
-          type: "POST",
-          url: '{{ url_for("routes.record_game_score") }}',
-          data: JSON.stringify(dict),
-          contentType: "application/json",
-        });
-      }
+        // Convert SVGs to images
+        function svgToImage(svgString) {
+          const img = new Image();
+          const svg = new Blob([svgString], { type: "image/svg+xml" });
+          img.src = URL.createObjectURL(svg);
+          return img;
+        }
 
-      // Initialize enemies
-      function initEnemies() {
-        enemies.length = 0;
-        for (let row = 0; row < enemyRows; row++) {
-          for (let col = 0; col < enemyCols; col++) {
-            enemies.push({
-              x: col * (enemyWidth + enemyPadding) + 50,
-              y: row * (enemyHeight + enemyPadding) + 50,
-              width: enemyWidth,
-              height: enemyHeight,
-              type: Math.floor(Math.random() * alienShipImgs.length),
-            });
+        function urlToImage(src) {
+          const img = new Image();
+          img.src = src;
+          return img;
+        }
+
+        let playerShipImg;
+        let alienShipImgs;
+        let ufoImg;
+
+        console.log("VERSION", version);
+        if (version === "0.5") {
+          // 0.5 is the "old" less pretty version :)
+          const playerShipSVG = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+            <path fill="#4a90e2" d="M25,2 L10,48 L25,38 L40,48 Z" />
+            <circle fill="#e74c3c" cx="25" cy="20" r="6" />
+        </svg>
+        `;
+
+          const alienShipSVGs = [
+            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+                <ellipse fill="#8e44ad" cx="25" cy="25" rx="20" ry="10" />
+                <circle fill="#2ecc71" cx="25" cy="25" r="5" />
+                <rect fill="#8e44ad" x="5" y="20" width="40" height="10" />
+            </svg>`,
+            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+                <path fill="#e67e22" d="M10,25 Q25,5 40,25 Q25,45 10,25 Z" />
+                <circle fill="#3498db" cx="25" cy="25" r="5" />
+            </svg>`,
+            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+                <rect fill="#c0392b" x="10" y="20" width="30" height="20" rx="10" ry="10" />
+                <circle fill="#f1c40f" cx="20" cy="30" r="3" />
+                <circle fill="#f1c40f" cx="30" cy="30" r="3" />
+            </svg>`,
+          ];
+
+          playerShipImg = svgToImage(playerShipSVG);
+          alienShipImgs = alienShipSVGs.map(svgToImage);
+        } else {
+          // anything else means the fancier flavor
+          const alienShipURIs = [
+            "{{ url_for('static', filename='imvaders/a1.png') }}",
+            "{{ url_for('static', filename='imvaders/a2.png') }}",
+            "{{ url_for('static', filename='imvaders/a3.png') }}",
+          ];
+
+          playerShipImg = urlToImage("{{ url_for('static', filename='imvaders/ship2.png') }}");
+          alienShipImgs = alienShipURIs.map(urlToImage);
+          ufoImg = urlToImage("{{ url_for('static', filename='imvaders/a4.png') }}");
+        }
+
+        // Stars
+        const stars = [];
+
+        // Enemies
+        const enemies = [];
+        const enemyRows = 5;
+        const enemyCols = 10;
+        const enemyWidth = 40;
+        const enemyHeight = 40;
+        const enemyPadding = 10;
+
+        // Bullets
+        const bullets = [];
+        const enemyBullets = [];
+        const bulletWidth = 3;
+        const bulletHeight = 10;
+        const bulletSpeed = 7;
+
+        // Sounds
+        const shootSound = new Audio(
+                "{{ url_for('static', filename='imvaders/laser.mp3') }}"
+        );
+        const explosionSound = new Audio(
+                "{{ url_for('static', filename='imvaders/explode.mp3') }}"
+        );
+        const playerHitSound = new Audio(
+                "{{ url_for('static', filename='imvaders/glitch.wav') }}"
+        );
+        const levelUpSound = new Audio(
+                "https://assets.mixkit.co/active_storage/sfx/220/220-preview.mp3"
+        );
+
+        shootSound.volume = 0;
+        explosionSound.volume = 0;
+        playerHitSound.volume = 0;
+        levelUpSound.volume = 0;
+
+        function postState() {
+          if (!gameOver) gameDuration += 2;
+          dict = {
+            game_session_id: "{{ gamesession }}",
+            title: "imvaders",
+            player_name: "{{ user_username }}",
+            player_id: "{{ user_uuid }}",
+            active: !gameOver,
+            level: level,
+            lives_remaining: lives,
+            current_score: score,
+            position: [player.x, player.y],
+            projectiles: bullets.length,
+            duration: gameDuration,
+            version: version,
+          };
+
+          $.ajax({
+            type: "POST",
+            url: '{{ url_for("routes.record_game_score") }}',
+            data: JSON.stringify(dict),
+            contentType: "application/json",
+          });
+        }
+
+        // Initialize enemies
+        function initEnemies() {
+          enemies.length = 0;
+          for (let row = 0; row < enemyRows; row++) {
+            for (let col = 0; col < enemyCols; col++) {
+              enemies.push({
+                x: col * (enemyWidth + enemyPadding) + 50,
+                y: row * (enemyHeight + enemyPadding) + 50,
+                width: enemyWidth,
+                height: enemyHeight,
+                type: Math.floor(Math.random() * alienShipImgs.length),
+              });
+            }
           }
         }
-      }
 
-      initEnemies();
+        initEnemies();
 
-      // Initialize barriers
-      function initBarriers() {
-        barriers.length = 0;
-        const spacing = canvas.width / (BARRIER_COUNT + 1);
+        // Initialize barriers
+        function initBarriers() {
+          barriers.length = 0;
+          const spacing = canvas.width / (BARRIER_COUNT + 1);
 
-        for (let i = 0; i < BARRIER_COUNT; i++) {
-          const barrier = {
-            x: spacing * (i + 1) - BARRIER_WIDTH / 2,
-            y: BARRIER_Y,
-            width: BARRIER_WIDTH,
-            height: BARRIER_HEIGHT,
-            pixels: new Array(Math.ceil(BARRIER_WIDTH / BARRIER_RESOLUTION))
-              .fill()
-              .map(() =>
-                new Array(Math.ceil(BARRIER_HEIGHT / BARRIER_RESOLUTION)).fill(
-                  1
-                )
-              ),
-          };
-          barriers.push(barrier);
+          for (let i = 0; i < BARRIER_COUNT; i++) {
+            const barrier = {
+              x: spacing * (i + 1) - BARRIER_WIDTH / 2,
+              y: BARRIER_Y,
+              width: BARRIER_WIDTH,
+              height: BARRIER_HEIGHT,
+              pixels: new Array(Math.ceil(BARRIER_WIDTH / BARRIER_RESOLUTION))
+                      .fill()
+                      .map(() =>
+                              new Array(Math.ceil(BARRIER_HEIGHT / BARRIER_RESOLUTION)).fill(
+                                      1
+                              )
+                      ),
+            };
+            barriers.push(barrier);
+          }
         }
-      }
 
-      initBarriers();
+        initBarriers();
 
-      function drawBarriers() {
-        barriers.forEach(barrier => {
+        function drawBarriers() {
+          barriers.forEach(barrier => {
             // First pass: Draw the outer glow using alpha
             ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
             for (let x = 0; x < barrier.pixels.length; x++) {
-                for (let y = 0; y < barrier.pixels[x].length; y++) {
-                    if (barrier.pixels[x][y]) {
-                        // Draw larger rectangle for glow
-                        ctx.fillRect(
-                            barrier.x + x * BARRIER_RESOLUTION - 2,
-                            barrier.y + y * BARRIER_RESOLUTION - 2,
-                            BARRIER_RESOLUTION + 4,
-                            BARRIER_RESOLUTION + 4
-                        );
-                    }
+              for (let y = 0; y < barrier.pixels[x].length; y++) {
+                if (barrier.pixels[x][y]) {
+                  // Draw larger rectangle for glow
+                  ctx.fillRect(
+                          barrier.x + x * BARRIER_RESOLUTION - 2,
+                          barrier.y + y * BARRIER_RESOLUTION - 2,
+                          BARRIER_RESOLUTION + 4,
+                          BARRIER_RESOLUTION + 4
+                  );
                 }
+              }
             }
 
             // Second pass: Draw the inner glow
             ctx.fillStyle = 'rgba(0, 255, 0, 0.4)';
             for (let x = 0; x < barrier.pixels.length; x++) {
-                for (let y = 0; y < barrier.pixels[x].length; y++) {
-                    if (barrier.pixels[x][y]) {
-                        // Draw medium rectangle for inner glow
-                        ctx.fillRect(
-                            barrier.x + x * BARRIER_RESOLUTION - 1,
-                            barrier.y + y * BARRIER_RESOLUTION - 1,
-                            BARRIER_RESOLUTION + 2,
-                            BARRIER_RESOLUTION + 2
-                        );
-                    }
+              for (let y = 0; y < barrier.pixels[x].length; y++) {
+                if (barrier.pixels[x][y]) {
+                  // Draw medium rectangle for inner glow
+                  ctx.fillRect(
+                          barrier.x + x * BARRIER_RESOLUTION - 1,
+                          barrier.y + y * BARRIER_RESOLUTION - 1,
+                          BARRIER_RESOLUTION + 2,
+                          BARRIER_RESOLUTION + 2
+                  );
                 }
+              }
             }
 
             // Final pass: Draw the solid barrier pixels
             ctx.fillStyle = '#00ff00';
             for (let x = 0; x < barrier.pixels.length; x++) {
-                for (let y = 0; y < barrier.pixels[x].length; y++) {
-                    if (barrier.pixels[x][y]) {
-                        // Draw actual barrier pixel
-                        ctx.fillRect(
-                            barrier.x + x * BARRIER_RESOLUTION,
-                            barrier.y + y * BARRIER_RESOLUTION,
-                            BARRIER_RESOLUTION,
-                            BARRIER_RESOLUTION
-                        );
-                    }
+              for (let y = 0; y < barrier.pixels[x].length; y++) {
+                if (barrier.pixels[x][y]) {
+                  // Draw actual barrier pixel
+                  ctx.fillRect(
+                          barrier.x + x * BARRIER_RESOLUTION,
+                          barrier.y + y * BARRIER_RESOLUTION,
+                          BARRIER_RESOLUTION,
+                          BARRIER_RESOLUTION
+                  );
                 }
+              }
             }
-        });
-    }
+          });
+        }
 
-      // Add damage to barrier at specific coordinates
-      function damageBarrier(barrier, hitX, hitY, radius = 2) {
-        const barrierX = Math.floor((hitX - barrier.x) / BARRIER_RESOLUTION);
-        const barrierY = Math.floor((hitY - barrier.y) / BARRIER_RESOLUTION);
+        // Add damage to barrier at specific coordinates
+        function damageBarrier(barrier, hitX, hitY, radius = 2) {
+          const barrierX = Math.floor((hitX - barrier.x) / BARRIER_RESOLUTION);
+          const barrierY = Math.floor((hitY - barrier.y) / BARRIER_RESOLUTION);
 
-        // Create circular damage pattern
-        for (let x = -radius; x <= radius; x++) {
-          for (let y = -radius; y <= radius; y++) {
-            if (x * x + y * y <= radius * radius) {
-              const pixelX = barrierX + x;
-              const pixelY = barrierY + y;
+          // Create circular damage pattern
+          for (let x = -radius; x <= radius; x++) {
+            for (let y = -radius; y <= radius; y++) {
+              if (x * x + y * y <= radius * radius) {
+                const pixelX = barrierX + x;
+                const pixelY = barrierY + y;
 
-              if (
-                pixelX >= 0 &&
-                pixelX < barrier.pixels.length &&
-                pixelY >= 0 &&
-                pixelY < barrier.pixels[0].length
-              ) {
-                barrier.pixels[pixelX][pixelY] = 0;
+                if (
+                        pixelX >= 0 &&
+                        pixelX < barrier.pixels.length &&
+                        pixelY >= 0 &&
+                        pixelY < barrier.pixels[0].length
+                ) {
+                  barrier.pixels[pixelX][pixelY] = 0;
+                }
               }
             }
           }
         }
-      }
 
-          // Check collision between point and barrier
-      function checkBarrierCollision(x, y) {
+        // Check collision between point and barrier
+        function checkBarrierCollision(x, y) {
+          if (version === "0.75") {
+            return;
+          }
+
           for (let barrier of barriers) {
             if (
-              x >= barrier.x &&
-              x < barrier.x + barrier.width &&
-              y >= barrier.y &&
-              y < barrier.y + barrier.height
+                    x >= barrier.x &&
+                    x < barrier.x + barrier.width &&
+                    y >= barrier.y &&
+                    y < barrier.y + barrier.height
             ) {
               const barrierX = Math.floor((x - barrier.x) / BARRIER_RESOLUTION);
               const barrierY = Math.floor((y - barrier.y) / BARRIER_RESOLUTION);
 
               if (
-                barrierX >= 0 &&
-                barrierX < barrier.pixels.length &&
-                barrierY >= 0 &&
-                barrierY < barrier.pixels[0].length &&
-                barrier.pixels[barrierX][barrierY]
+                      barrierX >= 0 &&
+                      barrierX < barrier.pixels.length &&
+                      barrierY >= 0 &&
+                      barrierY < barrier.pixels[0].length &&
+                      barrier.pixels[barrierX][barrierY]
               ) {
                 damageBarrier(barrier, x, y);
                 return true;
@@ -324,169 +363,219 @@
           return false;
         }
 
-      function checkEnemyBarrierCollisions() {
+        function checkEnemyBarrierCollisions() {
           enemies.forEach((enemy) => {
             barriers.forEach((barrier) => {
               if (
-                enemy.y + enemy.height >= barrier.y &&
-                enemy.x < barrier.x + barrier.width &&
-                enemy.x + enemy.width > barrier.x
+                      enemy.y + enemy.height >= barrier.y &&
+                      enemy.x < barrier.x + barrier.width &&
+                      enemy.x + enemy.width > barrier.x
               ) {
                 // Create multiple damage points across the enemy width
                 const damagePoints = 5;
                 for (let i = 0; i < damagePoints; i++) {
                   const damageX =
-                    enemy.x + enemy.width * (i / (damagePoints - 1));
+                          enemy.x + enemy.width * (i / (damagePoints - 1));
                   damageBarrier(barrier, damageX, barrier.y, 3); // Larger damage radius
                 }
 
                 // Play explosion sound for dramatic effect
-                //explosionSound.currentTime = 0;
-                //explosionSound.play();
+                explosionSound.currentTime = 0;
+                explosionSound.play();
               }
             });
           });
         }
 
-      function spawnUFO() {
-        const direction = Math.random() < 0.5 ? 1 : -1;  // Randomly choose direction
-        const startX = direction === 1 ? -50 : canvas.width + 50;  // Start off-screen
-      
-        ufo = {
-          x: startX,
-          y: 30,
-          width: 40,
-          height: 20,
-          speed: 3 * direction
-        };
-      }
+        function spawnUFO() {
+          const direction = Math.random() < 0.5 ? 1 : -1;  // Randomly choose direction
+          const startX = direction === 1 ? -50 : canvas.width + 50;  // Start off-screen
 
-      function updateUFO() {
-        if (!ufo) {
-          // Chance to spawn new UFO if enough time has passed
-          if (Date.now() - lastUfoSpawn > 10000 && Math.random() < 0.01) {
-            spawnUFO();
-            lastUfoSpawn = Date.now();
-          }
-          return;
+          ufo = {
+            x: startX,
+            y: 30,
+            width: 40,
+            height: 20,
+            speed: 3 * direction
+          };
         }
 
-        // Move UFO
-        ufo.x += ufo.speed;
+        function updateUFO() {
+          if (!ufo) {
+            // Chance to spawn new UFO if enough time has passed
+            if (Date.now() - lastUfoSpawn > 10000 && Math.random() < 0.01) {
+              spawnUFO();
+              lastUfoSpawn = Date.now();
+            }
+            return;
+          }
 
-        // Remove UFO if it goes off screen
-        if ((ufo.speed > 0 && ufo.x > canvas.width + 50) || 
-            (ufo.speed < 0 && ufo.x < -50)) {
-          ufo = null;
+          // Move UFO
+          ufo.x += ufo.speed;
+
+          // Remove UFO if it goes off screen
+          if ((ufo.speed > 0 && ufo.x > canvas.width + 50) ||
+                  (ufo.speed < 0 && ufo.x < -50)) {
+            ufo = null;
+          }
         }
-      }
 
-      function drawUFO() {
-        if (!ufo) return;
-        ctx.drawImage(ufoImg, ufo.x, ufo.y, ufo.width, ufo.height);
-      }
+        function drawUFO() {
+          // no ufo in 0.5 the "old" more basic version
+          if (!ufo || version === "0.5") return;
+          console.log("DRAW UFO");
+          ctx.drawImage(ufoImg, ufo.x, ufo.y, ufo.width, ufo.height);
+        }
 
-      // Update and draw stars
-      function updateStars() {
-        ctx.fillStyle = "white";
-        stars.forEach((star) => {
-          star.y += star.speed;
-          if (star.y > canvas.height) {
-            star.y = 0;
-            star.x = Math.random() * canvas.width;
-          }
-          ctx.beginPath();
-          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
-
-      function moveEnemies() {
-        let shouldChangeDirection = false;
-        enemies.forEach((enemy) => {
-          enemy.x += enemySpeed * enemyDirection;
-          if (enemy.x <= 0 || enemy.x + enemy.width >= canvas.width) {
-            shouldChangeDirection = true;
-          }
-        });
-
-        if (shouldChangeDirection) {
-          enemyDirection *= -1;
-          enemies.forEach((enemy) => {
-            enemy.y += enemyDropDistance;
+        // Update and draw stars
+        function updateStars() {
+          ctx.fillStyle = "white";
+          stars.forEach((star) => {
+            star.y += star.speed;
+            if (star.y > canvas.height) {
+              star.y = 0;
+              star.x = Math.random() * canvas.width;
+            }
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            ctx.fill();
           });
         }
-      }
 
-      function shoot() {
-        bullets.push({
-          x: player.x + player.width / 2 - bulletWidth / 2,
-          y: player.y,
-          width: bulletWidth,
-          height: bulletHeight,
-        });
-        shootSound.currentTime = 0;
-        shootSound.play();
-      }
+        function moveEnemies() {
+          let shouldChangeDirection = false;
+          enemies.forEach((enemy) => {
+            enemy.x += enemySpeed * enemyDirection;
+            if (enemy.x <= 0 || enemy.x + enemy.width >= canvas.width) {
+              shouldChangeDirection = true;
+            }
+          });
 
-      function enemyShoot() {
-        if (enemies.length > 0 && Math.random() < 0.02) {
-          const shootingEnemy =
-            enemies[Math.floor(Math.random() * enemies.length)];
-          enemyBullets.push({
-            x: shootingEnemy.x + shootingEnemy.width / 2 - bulletWidth / 2,
-            y: shootingEnemy.y + shootingEnemy.height,
+          if (shouldChangeDirection) {
+            enemyDirection *= -1;
+            enemies.forEach((enemy) => {
+              enemy.y += enemyDropDistance;
+            });
+          }
+        }
+
+        function shoot() {
+          bullets.push({
+            x: player.x + player.width / 2 - bulletWidth / 2,
+            y: player.y,
             width: bulletWidth,
             height: bulletHeight,
           });
+          shootSound.currentTime = 0;
+          shootSound.play();
         }
-      }
 
-      function updateBullets() {
-        // Player bullets
-        bullets.forEach((bullet, index) => {
-          bullet.y -= bulletSpeed;
-          if (bullet.y < 0) {
-            bullets.splice(index, 1);
-          }
-
-          // Check UFO collision
-          if (ufo && 
-              bullet.x < ufo.x + ufo.width &&
-              bullet.x + bullet.width > ufo.x &&
-              bullet.y < ufo.y + ufo.height &&
-              bullet.y + bullet.height > ufo.y) {
-            bullets.splice(index, 1);
-            score += 100;
-            ufo = null;
-            explosionSound.currentTime = 0;
-            explosionSound.play();
-            drawScore({
-              Score: score,
-              Lives: lives,
-              Level: level,
+        function enemyShoot() {
+          if (enemies.length > 0 && Math.random() < 0.02) {
+            const shootingEnemy =
+                    enemies[Math.floor(Math.random() * enemies.length)];
+            enemyBullets.push({
+              x: shootingEnemy.x + shootingEnemy.width / 2 - bulletWidth / 2,
+              y: shootingEnemy.y + shootingEnemy.height,
+              width: bulletWidth,
+              height: bulletHeight,
             });
-            return;
           }
+        }
 
-          // Check barrier collision 
-          if (checkBarrierCollision(bullet.x + bullet.width / 2, bullet.y)) {
-            bullets.splice(index, 1);
-            return;
-          }
-
-          enemies.forEach((enemy, enemyIndex) => {
-            if (
-              bullet.x < enemy.x + enemy.width &&
-              bullet.x + bullet.width > enemy.x &&
-              bullet.y < enemy.y + enemy.height &&
-              bullet.y + bullet.height > enemy.y
-            ) {
-              enemies.splice(enemyIndex, 1);
+        function updateBullets() {
+          // Player bullets
+          bullets.forEach((bullet, index) => {
+            bullet.y -= bulletSpeed;
+            if (bullet.y < 0) {
               bullets.splice(index, 1);
-              score += 10;
+            }
+
+            // Check UFO collision
+            if (ufo &&
+                    bullet.x < ufo.x + ufo.width &&
+                    bullet.x + bullet.width > ufo.x &&
+                    bullet.y < ufo.y + ufo.height &&
+                    bullet.y + bullet.height > ufo.y) {
+              bullets.splice(index, 1);
+              score += 100;
+              ufo = null;
               explosionSound.currentTime = 0;
               explosionSound.play();
+              drawScore({
+                Score: score,
+                Lives: lives,
+                Level: level,
+              });
+              return;
+            }
+
+            // Check barrier collision
+            if (checkBarrierCollision(bullet.x + bullet.width / 2, bullet.y)) {
+              bullets.splice(index, 1);
+              return;
+            }
+
+            enemies.forEach((enemy, enemyIndex) => {
+              if (
+                      bullet.x < enemy.x + enemy.width &&
+                      bullet.x + bullet.width > enemy.x &&
+                      bullet.y < enemy.y + enemy.height &&
+                      bullet.y + bullet.height > enemy.y
+              ) {
+                enemies.splice(enemyIndex, 1);
+                bullets.splice(index, 1);
+                score += 10;
+                explosionSound.currentTime = 0;
+                explosionSound.play();
+
+                drawScore({
+                  Score: score,
+                  Lives: lives,
+                  Level: level,
+                });
+
+                if (enemies.length === 0) {
+                  levelUp();
+                }
+              }
+            });
+          });
+
+          // Enemy bullets
+          enemyBullets.forEach((bullet, index) => {
+            bullet.y += bulletSpeed;
+            if (bullet.y > canvas.height) {
+              enemyBullets.splice(index, 1);
+            }
+
+            // Check barrier collision first
+            if (
+                    checkBarrierCollision(
+                            bullet.x + bullet.width / 2,
+                            bullet.y + bullet.height
+                    )
+            ) {
+              enemyBullets.splice(index, 1);
+              return;
+            }
+
+            if (
+                    bullet.x < player.x + player.width &&
+                    bullet.x + bullet.width > player.x &&
+                    bullet.y < player.y + player.height &&
+                    bullet.y + bullet.height > player.y &&
+                    !isDeathAnimating
+            ) {
+              enemyBullets.splice(index, 1);
+              lives--;
+              playerHitSound.currentTime = 0;
+              playerHitSound.play();
+
+              if (lives > 0) {
+                isDeathAnimating = true;
+                deathAnimationFrame = 0;
+              }
 
               drawScore({
                 Score: score,
@@ -494,457 +583,405 @@
                 Level: level,
               });
 
-              if (enemies.length === 0) {
-                levelUp();
+              if (lives <= 0) {
+                gameOver = true;
+
+                unlockQuizQuestions(question_counts[version]);
+
+                postState();
               }
             }
           });
-        });
+        }
 
-        // Enemy bullets
-        enemyBullets.forEach((bullet, index) => {
-          bullet.y += bulletSpeed;
-          if (bullet.y > canvas.height) {
-            enemyBullets.splice(index, 1);
-          }
+        function drawScore(data) {
+          const text = `score: ${data.Score} | lives: ${data.Lives} | level: ${data.Level} | ver: ${data.Version}`;
+          const startX = canvas.width / 2;
+          const startY = 15;
+          ctx.fillStyle = "white";
+          ctx.font = "14px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText(text, startX, startY);
+        }
 
-          // Check barrier collision first
-          if (
-            checkBarrierCollision(
-              bullet.x + bullet.width / 2,
-              bullet.y + bullet.height
-            )
-          ) {
-            enemyBullets.splice(index, 1);
-            return;
-          }
+        function drawBullets() {
+          // Player bullets with blue glow
+          bullets.forEach((bullet) => {
+            const gradient = ctx.createRadialGradient(
+                    bullet.x + bullet.width / 2,
+                    bullet.y + bullet.height / 2,
+                    0,
+                    bullet.x + bullet.width / 2,
+                    bullet.y + bullet.height / 2,
+                    10
+            );
+            gradient.addColorStop(0, "rgba(255, 255, 255, 1)"); // White center
+            gradient.addColorStop(0.4, "rgba(0, 196, 255, 0.5)"); // Blue glow
+            gradient.addColorStop(1, "rgba(0, 196, 255, 0)"); // Fade out
 
-          if (
-            bullet.x < player.x + player.width &&
-            bullet.x + bullet.width > player.x &&
-            bullet.y < player.y + player.height &&
-            bullet.y + bullet.height > player.y &&
-            !isDeathAnimating
-          ) {
-            enemyBullets.splice(index, 1);
-            lives--;
-            playerHitSound.currentTime = 0;
-            playerHitSound.play();
+            ctx.fillStyle = gradient;
+            ctx.fillRect(
+                    bullet.x - 8,
+                    bullet.y - 8,
+                    bullet.width + 16,
+                    bullet.height + 16
+            );
+            ctx.fillStyle = "white"; // Core of the bullet
+            ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+          });
 
-            if (lives > 0) {
-              isDeathAnimating = true;
-              deathAnimationFrame = 0;
-            }
+          // Enemy bullets with red glow
+          enemyBullets.forEach((bullet) => {
+            const gradient = ctx.createRadialGradient(
+                    bullet.x + bullet.width / 2,
+                    bullet.y + bullet.height / 2,
+                    0,
+                    bullet.x + bullet.width / 2,
+                    bullet.y + bullet.height / 2,
+                    10
+            );
+            gradient.addColorStop(0, "rgba(255, 255, 255, 1)"); // White center
+            gradient.addColorStop(0.4, "rgba(255, 0, 0, 0.5)"); // Red glow
+            gradient.addColorStop(1, "rgba(255, 0, 0, 0)"); // Fade out
 
-            drawScore({
-              Score: score,
-              Lives: lives,
-              Level: level,
-            });
+            ctx.fillStyle = gradient;
+            ctx.fillRect(
+                    bullet.x - 8,
+                    bullet.y - 8,
+                    bullet.width + 16,
+                    bullet.height + 16
+            );
+            ctx.fillStyle = "red"; // Core of the bullet
+            ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+          });
+        }
 
-            if (lives <= 0) {
-              gameOver = true;
-              // unlock a question so they can advance to not slow version w/out having to win
-              unlockQuizQuestion();
-              postState();
-            }
-          }
-        });
-      }
+        function createGlitchEffect(imageData, intensity) {
+          const data = imageData.data;
+          const width = imageData.width;
+          const height = imageData.height;
 
-      function drawScore(data) {
-        const text = `score: ${data.Score} | lives: ${data.Lives} | level: ${data.Level}`;
-        const startX = canvas.width / 2;
-        const startY = 15;
-        ctx.fillStyle = "white";
-        ctx.font = "14px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(text, startX, startY);
-      }
+          // Create random glitch slices
+          for (let i = 0; i < intensity; i++) {
+            const y = Math.random() * height;
+            const sliceHeight = Math.random() * 20 + 2;
+            const offset = Math.random() * 20 - 10;
 
-      function drawBullets() {
-        // Player bullets with blue glow
-        bullets.forEach((bullet) => {
-          const gradient = ctx.createRadialGradient(
-            bullet.x + bullet.width / 2,
-            bullet.y + bullet.height / 2,
-            0,
-            bullet.x + bullet.width / 2,
-            bullet.y + bullet.height / 2,
-            10
-          );
-          gradient.addColorStop(0, "rgba(255, 255, 255, 1)"); // White center
-          gradient.addColorStop(0.4, "rgba(0, 196, 255, 0.5)"); // Blue glow
-          gradient.addColorStop(1, "rgba(0, 196, 255, 0)"); // Fade out
+            // Shift a slice of pixels
+            for (let j = y; j < y + sliceHeight && j < height; j++) {
+              for (let k = 0; k < width; k++) {
+                const sourceIdx = (Math.floor(j) * width + k) * 4;
+                const targetIdx =
+                        (Math.floor(j) * width + Math.floor(k + offset)) * 4;
 
-          ctx.fillStyle = gradient;
-          ctx.fillRect(
-            bullet.x - 8,
-            bullet.y - 8,
-            bullet.width + 16,
-            bullet.height + 16
-          );
-          ctx.fillStyle = "white"; // Core of the bullet
-          ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-        });
-
-        // Enemy bullets with red glow
-        enemyBullets.forEach((bullet) => {
-          const gradient = ctx.createRadialGradient(
-            bullet.x + bullet.width / 2,
-            bullet.y + bullet.height / 2,
-            0,
-            bullet.x + bullet.width / 2,
-            bullet.y + bullet.height / 2,
-            10
-          );
-          gradient.addColorStop(0, "rgba(255, 255, 255, 1)"); // White center
-          gradient.addColorStop(0.4, "rgba(255, 0, 0, 0.5)"); // Red glow
-          gradient.addColorStop(1, "rgba(255, 0, 0, 0)"); // Fade out
-
-          ctx.fillStyle = gradient;
-          ctx.fillRect(
-            bullet.x - 8,
-            bullet.y - 8,
-            bullet.width + 16,
-            bullet.height + 16
-          );
-          ctx.fillStyle = "red"; // Core of the bullet
-          ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-        });
-      }
-
-      function createGlitchEffect(imageData, intensity) {
-        const data = imageData.data;
-        const width = imageData.width;
-        const height = imageData.height;
-
-        // Create random glitch slices
-        for (let i = 0; i < intensity; i++) {
-          const y = Math.random() * height;
-          const sliceHeight = Math.random() * 20 + 2;
-          const offset = Math.random() * 20 - 10;
-
-          // Shift a slice of pixels
-          for (let j = y; j < y + sliceHeight && j < height; j++) {
-            for (let k = 0; k < width; k++) {
-              const sourceIdx = (Math.floor(j) * width + k) * 4;
-              const targetIdx =
-                (Math.floor(j) * width + Math.floor(k + offset)) * 4;
-
-              if (targetIdx >= 0 && targetIdx < data.length - 3) {
-                for (let l = 0; l < 4; l++) {
-                  data[targetIdx + l] = data[sourceIdx + l];
+                if (targetIdx >= 0 && targetIdx < data.length - 3) {
+                  for (let l = 0; l < 4; l++) {
+                    data[targetIdx + l] = data[sourceIdx + l];
+                  }
                 }
               }
             }
           }
-        }
 
-        // Add color channel shifting
-        for (let i = 0; i < data.length; i += 4) {
-          if (Math.random() < 0.1) {
-            data[i] = Math.min(255, data[i] + Math.random() * 100); // R
-            data[i + 2] = Math.max(0, data[i + 2] - Math.random() * 50); // B
+          // Add color channel shifting
+          for (let i = 0; i < data.length; i += 4) {
+            if (Math.random() < 0.1) {
+              data[i] = Math.min(255, data[i] + Math.random() * 100); // R
+              data[i + 2] = Math.max(0, data[i + 2] - Math.random() * 50); // B
+            }
           }
         }
-      }
 
-      function levelUp() {
-        level++;
-        enemySpeed += 0.5;
-        initEnemies();
-        levelUpSound.currentTime = 0;
-        levelUpSound.play();
-        levelUpPause = true;
-        unlockQuizQuestion();
-      }
-
-      let isMuted = true;
-
-          // Define button position and size
-      const muteButtonWidth = 75;
-      const muteButtonHeight = 30;
-      const muteButtonX = 10;
-      const muteButtonY = canvas.height - 40;
-
-      function drawMuteButton() {
-        ctx.clearRect(
-          muteButtonX,
-          muteButtonY,
-          muteButtonWidth,
-          muteButtonHeight
-        );
-
-        ctx.fillStyle = "#333";
-        ctx.fillRect(
-          muteButtonX,
-          muteButtonY,
-          muteButtonWidth,
-          muteButtonHeight
-        );
-
-        ctx.fillStyle = "white";
-        ctx.font = "14px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        const buttonText = isMuted ? "unmute (m)" : "mute (m)";
-        ctx.fillText(
-          buttonText,
-          muteButtonX + muteButtonWidth / 2,
-          muteButtonY + muteButtonHeight / 2
-        );
-      }
-
-      function muteOrUnmute() {
-        isMuted = !isMuted;
-
-        let setVolume = 0;
-        if (!isMuted) {
-          setVolume = 0.1;
+        function levelUp() {
+          level++;
+          enemySpeed += 0.5;
+          initEnemies();
+          levelUpSound.currentTime = 0;
+          levelUpSound.play();
+          levelUpPause = true;
         }
 
-        shootSound.volume = setVolume;
-        explosionSound.volume = setVolume;
-        playerHitSound.volume = setVolume;
-        levelUpSound.volume = setVolume;
-      }
+        let isMuted = true;
 
-      drawMuteButton();
+        // Define button position and size
+        const muteButtonWidth = 75;
+        const muteButtonHeight = 30;
+        const muteButtonX = 10;
+        const muteButtonY = canvas.height - 40;
 
-      function gameLoop() {
-        if (gameOver) {
-          clearInterval(intervalID);
-          intervalID = null;
-          ctx.fillStyle = "black";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          updateStars();
-          ctx.fillStyle = "white";
-          ctx.font = "48px Arial";
-          ctx.textAlign = "center";
-          ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-          ctx.font = "24px Arial";
-          ctx.fillText(
-            `Final Score: ${score}`,
-            canvas.width / 2,
-            canvas.height / 2 + 50
+        function drawMuteButton() {
+          ctx.clearRect(
+                  muteButtonX,
+                  muteButtonY,
+                  muteButtonWidth,
+                  muteButtonHeight
           );
 
-          const text = "Press R to Restart";
-          const lines = text.split("\n");
-          lines.forEach((line, i) => {
-            ctx.fillText(
-              line,
-              canvas.width / 2,
-              canvas.height / 2 + 100 + i * 20
-            );
-          });
-
-          if (keys["KeyR"]) {
-            restartGame();
-          }
-          requestAnimationFrame(gameLoop);
-          return;
-        } else if (levelUpPause) {
-          ctx.fillStyle = "white";
-          ctx.font = "48px Arial";
-          ctx.textAlign = "center";
-          ctx.fillText("NEXT LEVEL?", canvas.width / 2, canvas.height / 2);
-          ctx.font = "24px Arial";
-          ctx.fillText(
-            `Final Score: ${score}`,
-            canvas.width / 2,
-            canvas.height / 2 + 50
+          ctx.fillStyle = "#333";
+          ctx.fillRect(
+                  muteButtonX,
+                  muteButtonY,
+                  muteButtonWidth,
+                  muteButtonHeight
           );
 
-          const text =
-            "Press C to Continue";
-          const lines = text.split("\n");
-          lines.forEach((line, i) => {
-            ctx.fillText(
-              line,
-              canvas.width / 2,
-              canvas.height / 2 + 100 + i * 20
-            );
-          });
+          ctx.fillStyle = "white";
+          ctx.font = "14px Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
 
-          if (keys["KeyC"]) {
-            levelUpPause = false;
+          const buttonText = isMuted ? "unmute (m)" : "mute (m)";
+          ctx.fillText(
+                  buttonText,
+                  muteButtonX + muteButtonWidth / 2,
+                  muteButtonY + muteButtonHeight / 2
+          );
+        }
+
+        function muteOrUnmute() {
+          isMuted = !isMuted;
+
+          let setVolume = 0;
+          if (!isMuted) {
+            setVolume = 0.1;
           }
-          requestAnimationFrame(gameLoop);
-          return;
-        }
 
-        if (!intervalID) {
-          intervalID = setInterval(postState, 2000);
+          shootSound.volume = setVolume;
+          explosionSound.volume = setVolume;
+          playerHitSound.volume = setVolume;
+          levelUpSound.volume = setVolume;
         }
-
-        // Clear the canvas
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         drawMuteButton();
-        drawScore({
-          Score: score,
-          Lives: lives,
-          Level: level,
-        });
 
-        // Update and draw stars
-        updateStars();
+        function gameLoop() {
+          if (gameOver) {
+            clearInterval(intervalID);
+            intervalID = null;
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            updateStars();
+            ctx.fillStyle = "white";
+            ctx.font = "48px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+            ctx.font = "24px Arial";
+            ctx.fillText(
+                    `Final Score: ${score}`,
+                    canvas.width / 2,
+                    canvas.height / 2 + 50
+            );
 
-        // Move player
-        if (keys["ArrowLeft"] && player.x > 0) {
-          player.x -= player.speed;
-        }
-        if (keys["ArrowRight"] && player.x < canvas.width - player.width) {
-          player.x += player.speed;
-        }
+            const text = "Press R to Restart";
+            const lines = text.split("\n");
+            lines.forEach((line, i) => {
+              ctx.fillText(
+                      line,
+                      canvas.width / 2,
+                      canvas.height / 2 + 100 + i * 20
+              );
+            });
 
-        if (isDeathAnimating) {
-          deathAnimationFrame++;
-
-          // Create an offscreen canvas for the glitch effect
-          const offscreen = document.createElement("canvas");
-          offscreen.width = player.width;
-          offscreen.height = player.height;
-          const offCtx = offscreen.getContext("2d");
-
-          // Draw the player ship to the offscreen canvas
-          offCtx.drawImage(playerShipImg, 0, 0, player.width, player.height);
-
-          // Apply glitch effect
-          const imageData = offCtx.getImageData(
-            0,
-            0,
-            player.width,
-            player.height
-          );
-          const intensity = Math.min(20, deathAnimationFrame / 2);
-          createGlitchEffect(imageData, intensity);
-          offCtx.putImageData(imageData, 0, 0);
-
-          // Draw the glitched ship to the main canvas
-          ctx.drawImage(
-            offscreen,
-            player.x,
-            player.y,
-            player.width,
-            player.height
-          );
-
-          // End animation after duration
-          if (deathAnimationFrame >= DEATH_ANIMATION_DURATION) {
-            isDeathAnimating = false;
-            deathAnimationFrame = 0;
-          }
-
-          // Pause other game actions during animation
-          requestAnimationFrame(gameLoop);
-          return;
-        }
-
-        // Draw player ship
-        ctx.drawImage(
-          playerShipImg,
-          player.x,
-          player.y,
-          player.width,
-          player.height
-        );
-
-        updateUFO();
-        drawUFO();
-
-        // Move and draw enemies
-        moveEnemies();
-        enemies.forEach((enemy) => {
-          ctx.drawImage(
-            alienShipImgs[enemy.type],
-            enemy.x,
-            enemy.y,
-            enemy.width,
-            enemy.height
-          );
-
-          // Check for game over conditions
-          if (enemy.y + enemy.height >= player.y) {
-            gameOver = true;
-
-            // unlock a question so they can advance to not slow version w/out having to win
-            unlockQuizQuestion();
-            postState();
-          }
-        });
-
-        checkEnemyBarrierCollisions();
-
-        // Enemy shooting
-        enemyShoot();
-
-        drawBarriers();
-        updateBullets();
-        drawBullets();
-
-        requestAnimationFrame(gameLoop);
-      }
-
-      function restartGame() {
-            score = 0;
-            lives = 3;
-            level = 1;
-            gameOver = false;
-            gameDuration = 0;
-            enemyDirection = 1;
-            enemySpeed = 1;
-            player.x = 375;
-            player.y = 530;
-            bullets.length = 0;
-            enemyBullets.length = 0;
-            ufo = null;
-            lastUfoSpawn = Date.now();
-            initEnemies();
-            initBarriers();
-            getVersion();
-          }
-
-      // Key states
-      const keys = {};
-
-     // Event listeners
-      document.addEventListener("keydown", (e) => {
-        keys[e.code] = true;
-        if (e.code === "Space") {
-          if (version < 1) {
-            // when on version <1 we only allow shooting one bullet at a time! :)
-            if (bullets.length < 1) {
-              shoot();
+            if (keys["KeyR"]) {
+              restartGame();
             }
-          } else {
-            shoot();
+            requestAnimationFrame(gameLoop);
+            return;
+          } else if (levelUpPause) {
+            ctx.fillStyle = "white";
+            ctx.font = "48px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("NEXT LEVEL?", canvas.width / 2, canvas.height / 2);
+            ctx.font = "24px Arial";
+            ctx.fillText(
+                    `Final Score: ${score}`,
+                    canvas.width / 2,
+                    canvas.height / 2 + 50
+            );
+
+            const text =
+                    "Press C to Continue";
+            const lines = text.split("\n");
+            lines.forEach((line, i) => {
+              ctx.fillText(
+                      line,
+                      canvas.width / 2,
+                      canvas.height / 2 + 100 + i * 20
+              );
+            });
+
+            if (keys["KeyC"]) {
+              levelUpPause = false;
+            }
+            requestAnimationFrame(gameLoop);
+            return;
           }
-        } else if (e.code === "KeyM") {
-          muteOrUnmute();
+
+          if (!intervalID) {
+            intervalID = setInterval(postState, 2000);
+          }
+
+          // Clear the canvas
+          ctx.fillStyle = "black";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
           drawMuteButton();
-        }
-      });
-      document.addEventListener("keyup", (e) => {
-            keys[e.code] = false;
+          drawScore({
+            Score: score,
+            Lives: lives,
+            Level: level,
+            Version: version,
           });
 
-          // Start the game loop when all images are loaded
-          Promise.all([
-            playerShipImg.decode(),
-            ...alienShipImgs.map((img) => img.decode()),
-            ufoImg.decode()
-          ])
-            .then(() => {
-              gameLoop();
-            })
-            .catch((err) => {
-              console.error("Error loading images:", err);
-            });
+          // Update and draw stars
+          updateStars();
+
+          // Move player
+          if (keys["ArrowLeft"] && player.x > 0) {
+            player.x -= player.speed;
+          }
+          if (keys["ArrowRight"] && player.x < canvas.width - player.width) {
+            player.x += player.speed;
+          }
+
+          if (isDeathAnimating) {
+            deathAnimationFrame++;
+
+            // Create an offscreen canvas for the glitch effect
+            const offscreen = document.createElement("canvas");
+            offscreen.width = player.width;
+            offscreen.height = player.height;
+            const offCtx = offscreen.getContext("2d");
+
+            // Draw the player ship to the offscreen canvas
+            offCtx.drawImage(playerShipImg, 0, 0, player.width, player.height);
+
+            // Apply glitch effect
+            const imageData = offCtx.getImageData(
+                    0,
+                    0,
+                    player.width,
+                    player.height
+            );
+            const intensity = Math.min(20, deathAnimationFrame / 2);
+            createGlitchEffect(imageData, intensity);
+            offCtx.putImageData(imageData, 0, 0);
+
+            // Draw the glitched ship to the main canvas
+            ctx.drawImage(
+                    offscreen,
+                    player.x,
+                    player.y,
+                    player.width,
+                    player.height
+            );
+
+            // End animation after duration
+            if (deathAnimationFrame >= DEATH_ANIMATION_DURATION) {
+              isDeathAnimating = false;
+              deathAnimationFrame = 0;
+            }
+
+            // Pause other game actions during animation
+            requestAnimationFrame(gameLoop);
+            return;
+          }
+
+          // Draw player ship
+          ctx.drawImage(
+                  playerShipImg,
+                  player.x,
+                  player.y,
+                  player.width,
+                  player.height
+          );
+
+          updateUFO();
+          drawUFO();
+
+          // Move and draw enemies
+          moveEnemies();
+          enemies.forEach((enemy) => {
+            ctx.drawImage(
+                    alienShipImgs[enemy.type],
+                    enemy.x,
+                    enemy.y,
+                    enemy.width,
+                    enemy.height
+            );
+
+            // Check for game over conditions
+            if (enemy.y + enemy.height >= player.y) {
+              gameOver = true;
+
+              postState();
+            }
+          });
+
+          checkEnemyBarrierCollisions();
+
+          enemyShoot();
+
+          drawBarriers();
+          updateBullets();
+          drawBullets();
+
+          requestAnimationFrame(gameLoop);
+        }
+
+        function restartGame() {
+          main();
+        }
+
+        // Key states
+        const keys = {};
+
+        // Event listeners
+        document.addEventListener("keydown", (e) => {
+          if (window.blockingModalOpen === true) return;
+
+          keys[e.code] = true;
+          if (e.code === "Space") {
+            if (version === "0.75") {
+              // when on version 0.75 we only allow shooting one bullet at a time! :)
+              if (bullets.length < 1) {
+                shoot();
+              }
+            } else {
+              shoot();
+            }
+          } else if (e.code === "KeyM") {
+            muteOrUnmute();
+            drawMuteButton();
+          }
+        });
+        document.addEventListener("keyup", (e) => {
+          if (window.blockingModalOpen === true) return;
+
+          keys[e.code] = false;
+        });
+
+        // Start the game loop when all images are loaded
+        let image_load_promises = [
+          playerShipImg.decode(),
+          ...alienShipImgs.map((img) => img.decode()),
+        ]
+
+        if (version !== "0.5") {
+          // the cool ufo guy is only available in the updated versions
+          image_load_promises.push(ufoImg.decode());
+        }
+
+        Promise.all(image_load_promises)
+                .then(() => {
+                  gameLoop();
+                })
+                .catch((err) => {
+                  console.error("Error loading images:", err);
+                });
+      }
+
+      main();
     </script>
   </body>
 </html>

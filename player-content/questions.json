@@ -1,673 +1,726 @@
 {
-  "imvaders": [
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "What version of the IMVaders game is more error-prone than the other versions?",
-      "link_text": "Click here to investigate using indexed tags in Splunk APM",
-      "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
-      "choices": [
-        {
-          "prompt": ".25",
-          "is_correct": false
-        },
-        {
-          "prompt": ".5",
-          "is_correct": false
-        },
-        {
-          "prompt": "1.0",
-          "is_correct": false
-        },
-        {
-          "prompt": ".75",
-          "is_correct": true
-        }
-      ]
-    },
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "Which endpoint is the culprit of all of those errors?",
-      "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
-      "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
-      "choices": [
-        {
-          "prompt": "/player_progression",
-          "is_correct": false
-        },
-        {
-          "prompt": "/record_quiz_scores",
-          "is_correct": false
-        },
-        {
-          "prompt": "/alive",
-          "is_correct": false
-        },
-        {
-          "prompt": "/blackhole_sun",
-          "is_correct": true
-        }
-      ]
-    },
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "If the projectile count is unusually high but scores are low, what might that indicate?",
-      "choices": [
-        {
-          "prompt": "Players might be missing the alien targets frequently.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Players are winning too easily.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The game is running too fast.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The game is experiencing a bug in score calculation.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "Are player score and projectile count sufficient to evaluate player performance?",
-      "choices": [
-        {
-          "prompt": "No, additional metrics like player health (lives remaining) might be useful.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Yes, these metrics cover everything important.",
-          "is_correct": false
-        },
-        {
-          "prompt": "No, these metrics are irrelevant to game performance.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Yes, these are the only metrics needed.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
-      "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
-      "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
-      "choices": [
-        {
-          "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
-          "is_correct": false
-        },
-        {
-          "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
-          "is_correct": false
-        },
-        {
-          "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, posgres, redis",
-          "is_correct": true
-        },
-        {
-          "prompt": "splunk-arcade-scoreboard, postgres, redis",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What kind of dashboard would help track player scores and projectile counts over time?",
-      "choices": [
-        {
-          "prompt": "A real-time graph plotting scores and projectile counts.",
-          "is_correct": true
-        },
-        {
-          "prompt": "A static chart showing the game’s design.",
-          "is_correct": false
-        },
-        {
-          "prompt": "A pie chart comparing player abilities.",
-          "is_correct": false
-        },
-        {
-          "prompt": "A spreadsheet listing player names.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "How could you correlate player score trends with projectile counts?",
-      "choices": [
-        {
-          "prompt": "By analyzing how projectile counts increase as scores change.",
-          "is_correct": true
-        },
-        {
-          "prompt": "By looking at them independently.",
-          "is_correct": false
-        },
-        {
-          "prompt": "By ignoring projectile counts and focusing on scores.",
-          "is_correct": false
-        },
-        {
-          "prompt": "By tracking only the highest score achieved.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What thresholds would you set for player score or projectile count to trigger an alert for potential issues?",
-      "choices": [
-        {
-          "prompt": "Values based on typical player behavior during normal gameplay.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Random values for experimentation.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Extremely high values that are impossible to reach.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Values that change randomly with no baseline.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "If the average player score drops significantly, how would you use Splunk Observability to find the root cause?",
-      "choices": [
-        {
-          "prompt": "Check metrics like version, projectile count, kubernetes pod restarts, and system performance.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Ignore the drop; it’s likely a fluke.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Restart the game and observe if the scores improve.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Call Tech Support.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What might it mean if projectile counts are high but player scores aren’t increasing?",
-      "choices": [
-        {
-          "prompt": "Players are using a lot of projectiles without hitting the alien targets.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Players are not engaged in the game.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The game’s scoring system is rewarding players randomly.",
-          "is_correct": false
-        },
-        {
-          "prompt": "AI has Likely infiltrated the Game.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What insights about player behavior can you gain by analyzing trends in projectile usage and scores?",
-      "choices": [
-        {
-          "prompt": "Whether players are engaged and improving over time.",
-          "is_correct": true
-        },
-        {
-          "prompt": "How often players use cheats.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The color preferences of most players.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The technical specs of players’ devices.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What Splunk Observability tool(s) can be used to form a hypothesis on why some players are advancing in levels significantly faster than others?",
-      "choices": [
-        {
-          "prompt": "Breakdown tool",
-          "is_correct": true
-        },
-        {
-          "prompt": "Profiling",
-          "is_correct": false
-        },
-        {
-          "prompt": "Tag Spotlight",
-          "is_correct": false
-        },
-        {
-          "prompt": "DB Analyzer",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "You'll have a dashboard with some data to investigate, including a player score metric. What do you think that metric will tell us about the game’s performance or player behavior?",
-      "link_text": "Click here to investigate service dependencies in Splunk APM!",
-      "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilte[…]%22%5D%7D%5D%7D,%22spanFilters%22:%5B%5D%7D&startTime=-15m",
-      "choices": [
-        {
-          "prompt": "It indicates how well players are performing in the game.",
-          "is_correct": true
-        },
-        {
-          "prompt": "It shows the number of projectiles fired.",
-          "is_correct": false
-        },
-        {
-          "prompt": "It measures the game's difficulty level.",
-          "is_correct": false
-        },
-        {
-          "prompt": "It tracks how fast players are moving.",
-          "is_correct": false
-        }
-      ]
-    }
-  ],
-  "logger": [
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "What type of information should be included in logs to understand player actions in the game?",
-      "choices": [
-        {
-          "prompt": "Player ID, and actions like movements, collisions, and level completion.",
-          "is_correct": true
-        },
-        {
-          "prompt": "The color of the player’s frog.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The background music being played.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The version of kubernetes it is deployed in.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "The logs are trying to WARN you about something. What is it?",
-      "link_text": "Click here to investigate in Splunk Log Observer",
-      "link": "https://app.__REALM__.signalfx.com/#/logs?SI=%7B%22selectedIndexes%22:%5B%7B%22__typename%22:%22SplunkEnterpriseIndex%22,%22indexID%22:%22GHVu2ULA4AE:splunk-arcade%22,%22name%22:%22splunk-arcade%22%7D%5D%7D&astate=%7B%22isStreaming%22:false,%22showLiveTail%22:false,%22liveTailOn%22:false%7D&iq=%7B%22selectedIntegrationId%22:%22GHVu2ULA4AE%22%7D&qd=%7B%22timeRange%22:%7B%22earliest%22:%22-15m%22,%22latest%22:%22now%22%7D,%22filters%22:%5B%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22logger%22%5D,%22field%22:%7B%22name%22:%22title%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D,%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22kube:container:player%22%5D,%22field%22:%7B%22name%22:%22sourcetype%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D%5D,%22aggregations%22:%5B%7B%22field%22:%22All%20(*)%22,%22aggregationFn%22:%22COUNT%22%7D%5D,%22groupings%22:%5B%7B%22field%22:%22severity%22%7D%5D,%22resolution%22:10,%22limit%22:10000,%22summaryLimit%22:150000,%22searchTimeRules%22:%5B%5D,%22useTopRecords%22:150000%7D",
-      "choices": [
-        {
-          "prompt": "The frog should try to find some flies.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The logs are moving too fast.",
-          "is_correct": false
-        },
-        {
-          "prompt": "There is no music. With no music is no desire to cross.",
-          "is_correct": false
-        },
-        {
-          "prompt": "There's a real problem with shrinkage. Too much shrinking.",
-          "is_correct": true
-        }
-      ]
-    },
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "What's the score from this trace?",
-      "link_text": "Click here to see the trace",
-      "link": "https://app.__REALM__.signalfx.com/#/apm/traces/3517415934adc33fc4bf553d4d7bb1ec",
-      "choices": [
-        {
-          "prompt": "250",
-          "is_correct": false
-        },
-        {
-          "prompt": "370",
-          "is_correct": true
-        },
-        {
-          "prompt": "490",
-          "is_correct": false
-        },
-        {
-          "prompt": "1,000,000",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "What is the longest jinja span?",
-      "link_text": "Click here to see the trace",
-      "link": "https://app.__REALM__.signalfx.com/#/apm/traces/da24bd449d4150153fd6a2c2c218ad15",
-      "choices": [
-        {
-          "prompt": "jinja2.render",
-          "is_correct": true
-        },
-        {
-          "prompt": "jinja2.load",
-          "is_correct": false
-        },
-        {
-          "prompt": "jinja2.compile",
-          "is_correct": false
-        },
-        {
-          "prompt": "jinja2.hair_color",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "is_fixed_position": true,
-      "source": "static",
-      "question": "What are the number of pods running at this time?",
-      "link_text": "Click here to view kubernetes navigator",
-      "link": "https://app.__REALM__.signalfx.com/#/infra/entity/k8sdeployments?dashboardId=GbkHF6BA4WY&endTimeUTC=1740008760000&mapSelection=splunk-arcade-player-router%20%7C%20splunk-arcade%20%7C%20gamify&metricClass=default&startTimeUTC=1739994360000",
-      "choices": [
-        {
-          "prompt": "2",
-          "is_correct": false
-        },
-        {
-          "prompt": "3",
-          "is_correct": false
-        },
-        {
-          "prompt": "4",
-          "is_correct": false
-        },
-        {
-          "prompt": "5",
-          "is_correct": true
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "If logs show frequent \"failure\" events, what might this indicate?",
-      "choices": [
-        {
-          "prompt": "The difficulty level of the game might be too high.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Players are not trying to win the game.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The game is too easy.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Players are finishing levels too quickly.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "How could you use logs to detect when a player encounters a bug?",
-      "choices": [
-        {
-          "prompt": "Search for entries showing unhandled errors or unexpected game states.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Wait for players to report issues.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Look for a decrease in player scores.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Look for repeated logs.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "Why might logging the position of obstacles during gameplay be useful?",
-      "choices": [
-        {
-          "prompt": "To debug issues like overlapping or missing obstacles.",
-          "is_correct": true
-        },
-        {
-          "prompt": "To display them on the game's leaderboard.",
-          "is_correct": false
-        },
-        {
-          "prompt": "To let players know where obstacles are.",
-          "is_correct": false
-        },
-        {
-          "prompt": "To increase the score of skilled players.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What additional context in logs would help analyze why players fail to complete a level?",
-      "choices": [
-        {
-          "prompt": "Events showing player actions before failure, such as movements and collisions.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Time of day when the player is active.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The player’s favorite color.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The score of the top-performing player.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "If logs show a pattern of players stopping at the same point in the game, what should you investigate?",
-      "choices": [
-        {
-          "prompt": "A possible bug, poor game design, or unclear instructions at that point.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Whether the graphics in that area are appealing.",
-          "is_correct": false
-        },
-        {
-          "prompt": "The players’ choice of avatar.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Whether players like the background music at that point.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "How could you use logs to determine the impact of introducing a new obstacle type?",
-      "choices": [
-        {
-          "prompt": "Check for logs showing increased collisions or player frustration events.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Search for players mentioning it in chat.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Wait for players to quit the game.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Compare the size of logs before and after the change.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What would be the best way to monitor if the game servers are handling player actions correctly?",
-      "choices": [
-        {
-          "prompt": "Log events showing all incoming player inputs and server responses.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Track only the fastest players.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Focus only on collision events.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Check the leaderboard scores periodically.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "How can analyzing logs help balance the difficulty of the game?",
-      "choices": [
-        {
-          "prompt": "By observing trends like frequent level failures or successes across players.",
-          "is_correct": true
-        },
-        {
-          "prompt": "By identifying the time of day most players are online.",
-          "is_correct": false
-        },
-        {
-          "prompt": "By looking at the average score of players.",
-          "is_correct": false
-        },
-        {
-          "prompt": "By changing the visuals of the game randomly.",
-          "is_correct": false
-        }
-      ]
-    },
-    {
-      "source": "static",
-      "question": "What is the value of having structured logs in a Frogger game?",
-      "choices": [
-        {
-          "prompt": "Structured logs make it easier to search, filter, and analyze key events.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Logs can be visually appealing.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Logs can replace the need for metrics entirely.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Structured logs reduce the number of events recorded.",
-          "is_correct": false
-        }
-      ]
-    }
-  ],
-  "bughunt": [
-    {
-      "source": "static",
-      "question": "What is the meaning of life?",
-      "choices": [
-        {
-          "prompt": "Potato.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Acquisition of wealth.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Acquisition of power.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Acquisition of mayonnaise",
-          "is_correct": false
-        }
-      ]
-    }
-  ],
-  "floppybird": [
-    {
-      "source": "static",
-      "question": "What is the meaning of life?",
-      "choices": [
-        {
-          "prompt": "Potato.",
-          "is_correct": true
-        },
-        {
-          "prompt": "Acquisition of wealth.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Acquisition of power.",
-          "is_correct": false
-        },
-        {
-          "prompt": "Acquisition of mayonnaise",
-          "is_correct": false
-        }
-      ]
-    }
-  ]
+  "imvaders": {
+    "fixed_order": [
+      {
+        "source": "static",
+        "question": "1What version of the IMVaders game is more error-prone than the other versions?",
+        "link_text": "Click here to investigate using indexed tags in Splunk APM",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
+        "choices": [
+          {
+            "prompt": ".25",
+            "is_correct": false
+          },
+          {
+            "prompt": ".5",
+            "is_correct": false
+          },
+          {
+            "prompt": "1.0",
+            "is_correct": false
+          },
+          {
+            "prompt": ".75",
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "2Which endpoint is the culprit of all of those errors?",
+        "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
+        "choices": [
+          {
+            "prompt": "/player_progression",
+            "is_correct": false
+          },
+          {
+            "prompt": "/record_quiz_scores",
+            "is_correct": false
+          },
+          {
+            "prompt": "/alive",
+            "is_correct": false
+          },
+          {
+            "prompt": "/blackhole_sun",
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "3If the projectile count is unusually high but scores are low, what might that indicate?",
+        "choices": [
+          {
+            "prompt": "Players might be missing the alien targets frequently.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Players are winning too easily.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The game is running too fast.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The game is experiencing a bug in score calculation.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "4What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
+        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
+        "choices": [
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, posgres, redis",
+            "is_correct": true
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, postgres, redis",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "5What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
+        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
+        "choices": [
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, posgres, redis",
+            "is_correct": true
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, postgres, redis",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "6What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
+        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
+        "choices": [
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, posgres, redis",
+            "is_correct": true
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, postgres, redis",
+            "is_correct": false
+          }
+        ]
+      }
+    ],
+    "other": [
+      {
+        "source": "static",
+        "question": "Are player score and projectile count sufficient to evaluate player performance?",
+        "choices": [
+          {
+            "prompt": "No, additional metrics like player health (lives remaining) might be useful.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Yes, these metrics cover everything important.",
+            "is_correct": false
+          },
+          {
+            "prompt": "No, these metrics are irrelevant to game performance.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Yes, these are the only metrics needed.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What kind of dashboard would help track player scores and projectile counts over time?",
+        "choices": [
+          {
+            "prompt": "A real-time graph plotting scores and projectile counts.",
+            "is_correct": true
+          },
+          {
+            "prompt": "A static chart showing the game’s design.",
+            "is_correct": false
+          },
+          {
+            "prompt": "A pie chart comparing player abilities.",
+            "is_correct": false
+          },
+          {
+            "prompt": "A spreadsheet listing player names.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "How could you correlate player score trends with projectile counts?",
+        "choices": [
+          {
+            "prompt": "By analyzing how projectile counts increase as scores change.",
+            "is_correct": true
+          },
+          {
+            "prompt": "By looking at them independently.",
+            "is_correct": false
+          },
+          {
+            "prompt": "By ignoring projectile counts and focusing on scores.",
+            "is_correct": false
+          },
+          {
+            "prompt": "By tracking only the highest score achieved.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What thresholds would you set for player score or projectile count to trigger an alert for potential issues?",
+        "choices": [
+          {
+            "prompt": "Values based on typical player behavior during normal gameplay.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Random values for experimentation.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Extremely high values that are impossible to reach.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Values that change randomly with no baseline.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "If the average player score drops significantly, how would you use Splunk Observability to find the root cause?",
+        "choices": [
+          {
+            "prompt": "Check metrics like version, projectile count, kubernetes pod restarts, and system performance.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Ignore the drop; it’s likely a fluke.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Restart the game and observe if the scores improve.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Call Tech Support.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What might it mean if projectile counts are high but player scores aren’t increasing?",
+        "choices": [
+          {
+            "prompt": "Players are using a lot of projectiles without hitting the alien targets.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Players are not engaged in the game.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The game’s scoring system is rewarding players randomly.",
+            "is_correct": false
+          },
+          {
+            "prompt": "AI has Likely infiltrated the Game.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What insights about player behavior can you gain by analyzing trends in projectile usage and scores?",
+        "choices": [
+          {
+            "prompt": "Whether players are engaged and improving over time.",
+            "is_correct": true
+          },
+          {
+            "prompt": "How often players use cheats.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The color preferences of most players.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The technical specs of players’ devices.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What Splunk Observability tool(s) can be used to form a hypothesis on why some players are advancing in levels significantly faster than others?",
+        "choices": [
+          {
+            "prompt": "Breakdown tool",
+            "is_correct": true
+          },
+          {
+            "prompt": "Profiling",
+            "is_correct": false
+          },
+          {
+            "prompt": "Tag Spotlight",
+            "is_correct": false
+          },
+          {
+            "prompt": "DB Analyzer",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "You'll have a dashboard with some data to investigate, including a player score metric. What do you think that metric will tell us about the game’s performance or player behavior?",
+        "link_text": "Click here to investigate service dependencies in Splunk APM!",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilte[…]%22%5D%7D%5D%7D,%22spanFilters%22:%5B%5D%7D&startTime=-15m",
+        "choices": [
+          {
+            "prompt": "It indicates how well players are performing in the game.",
+            "is_correct": true
+          },
+          {
+            "prompt": "It shows the number of projectiles fired.",
+            "is_correct": false
+          },
+          {
+            "prompt": "It measures the game's difficulty level.",
+            "is_correct": false
+          },
+          {
+            "prompt": "It tracks how fast players are moving.",
+            "is_correct": false
+          }
+        ]
+      }
+    ]
+  },
+  "logger": {
+    "fixed_order": [
+      {
+        "source": "static",
+        "question": "What type of information should be included in logs to understand player actions in the game?",
+        "choices": [
+          {
+            "prompt": "Player ID, and actions like movements, collisions, and level completion.",
+            "is_correct": true
+          },
+          {
+            "prompt": "The color of the player’s frog.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The background music being played.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The version of kubernetes it is deployed in.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "The logs are trying to WARN you about something. What is it?",
+        "link_text": "Click here to investigate in Splunk Log Observer",
+        "link": "https://app.__REALM__.signalfx.com/#/logs?SI=%7B%22selectedIndexes%22:%5B%7B%22__typename%22:%22SplunkEnterpriseIndex%22,%22indexID%22:%22GHVu2ULA4AE:splunk-arcade%22,%22name%22:%22splunk-arcade%22%7D%5D%7D&astate=%7B%22isStreaming%22:false,%22showLiveTail%22:false,%22liveTailOn%22:false%7D&iq=%7B%22selectedIntegrationId%22:%22GHVu2ULA4AE%22%7D&qd=%7B%22timeRange%22:%7B%22earliest%22:%22-15m%22,%22latest%22:%22now%22%7D,%22filters%22:%5B%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22logger%22%5D,%22field%22:%7B%22name%22:%22title%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D,%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22kube:container:player%22%5D,%22field%22:%7B%22name%22:%22sourcetype%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D%5D,%22aggregations%22:%5B%7B%22field%22:%22All%20(*)%22,%22aggregationFn%22:%22COUNT%22%7D%5D,%22groupings%22:%5B%7B%22field%22:%22severity%22%7D%5D,%22resolution%22:10,%22limit%22:10000,%22summaryLimit%22:150000,%22searchTimeRules%22:%5B%5D,%22useTopRecords%22:150000%7D",
+        "choices": [
+          {
+            "prompt": "The frog should try to find some flies.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The logs are moving too fast.",
+            "is_correct": false
+          },
+          {
+            "prompt": "There is no music. With no music is no desire to cross.",
+            "is_correct": false
+          },
+          {
+            "prompt": "There's a real problem with shrinkage. Too much shrinking.",
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What's the score from this trace?",
+        "link_text": "Click here to see the trace",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/traces/3517415934adc33fc4bf553d4d7bb1ec",
+        "choices": [
+          {
+            "prompt": "250",
+            "is_correct": false
+          },
+          {
+            "prompt": "370",
+            "is_correct": true
+          },
+          {
+            "prompt": "490",
+            "is_correct": false
+          },
+          {
+            "prompt": "1,000,000",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What is the longest jinja span?",
+        "link_text": "Click here to see the trace",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/traces/da24bd449d4150153fd6a2c2c218ad15",
+        "choices": [
+          {
+            "prompt": "jinja2.render",
+            "is_correct": true
+          },
+          {
+            "prompt": "jinja2.load",
+            "is_correct": false
+          },
+          {
+            "prompt": "jinja2.compile",
+            "is_correct": false
+          },
+          {
+            "prompt": "jinja2.hair_color",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What are the number of pods running at this time?",
+        "link_text": "Click here to view kubernetes navigator",
+        "link": "https://app.__REALM__.signalfx.com/#/infra/entity/k8sdeployments?dashboardId=GbkHF6BA4WY&endTimeUTC=1740008760000&mapSelection=splunk-arcade-player-router%20%7C%20splunk-arcade%20%7C%20gamify&metricClass=default&startTimeUTC=1739994360000",
+        "choices": [
+          {
+            "prompt": "2",
+            "is_correct": false
+          },
+          {
+            "prompt": "3",
+            "is_correct": false
+          },
+          {
+            "prompt": "4",
+            "is_correct": false
+          },
+          {
+            "prompt": "5",
+            "is_correct": true
+          }
+        ]
+      }
+    ],
+    "other": [
+      {
+        "source": "static",
+        "question": "If logs show frequent \"failure\" events, what might this indicate?",
+        "choices": [
+          {
+            "prompt": "The difficulty level of the game might be too high.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Players are not trying to win the game.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The game is too easy.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Players are finishing levels too quickly.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "How could you use logs to detect when a player encounters a bug?",
+        "choices": [
+          {
+            "prompt": "Search for entries showing unhandled errors or unexpected game states.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Wait for players to report issues.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Look for a decrease in player scores.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Look for repeated logs.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "Why might logging the position of obstacles during gameplay be useful?",
+        "choices": [
+          {
+            "prompt": "To debug issues like overlapping or missing obstacles.",
+            "is_correct": true
+          },
+          {
+            "prompt": "To display them on the game's leaderboard.",
+            "is_correct": false
+          },
+          {
+            "prompt": "To let players know where obstacles are.",
+            "is_correct": false
+          },
+          {
+            "prompt": "To increase the score of skilled players.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What additional context in logs would help analyze why players fail to complete a level?",
+        "choices": [
+          {
+            "prompt": "Events showing player actions before failure, such as movements and collisions.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Time of day when the player is active.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The player’s favorite color.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The score of the top-performing player.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "If logs show a pattern of players stopping at the same point in the game, what should you investigate?",
+        "choices": [
+          {
+            "prompt": "A possible bug, poor game design, or unclear instructions at that point.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Whether the graphics in that area are appealing.",
+            "is_correct": false
+          },
+          {
+            "prompt": "The players’ choice of avatar.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Whether players like the background music at that point.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "How could you use logs to determine the impact of introducing a new obstacle type?",
+        "choices": [
+          {
+            "prompt": "Check for logs showing increased collisions or player frustration events.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Search for players mentioning it in chat.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Wait for players to quit the game.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Compare the size of logs before and after the change.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What would be the best way to monitor if the game servers are handling player actions correctly?",
+        "choices": [
+          {
+            "prompt": "Log events showing all incoming player inputs and server responses.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Track only the fastest players.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Focus only on collision events.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Check the leaderboard scores periodically.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "How can analyzing logs help balance the difficulty of the game?",
+        "choices": [
+          {
+            "prompt": "By observing trends like frequent level failures or successes across players.",
+            "is_correct": true
+          },
+          {
+            "prompt": "By identifying the time of day most players are online.",
+            "is_correct": false
+          },
+          {
+            "prompt": "By looking at the average score of players.",
+            "is_correct": false
+          },
+          {
+            "prompt": "By changing the visuals of the game randomly.",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What is the value of having structured logs in a Frogger game?",
+        "choices": [
+          {
+            "prompt": "Structured logs make it easier to search, filter, and analyze key events.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Logs can be visually appealing.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Logs can replace the need for metrics entirely.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Structured logs reduce the number of events recorded.",
+            "is_correct": false
+          }
+        ]
+      }
+    ]
+  },
+  "bughunt": {
+    "fixed_order": [
+      {
+        "source": "static",
+        "question": "What is the meaning of life?",
+        "choices": [
+          {
+            "prompt": "Potato.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Acquisition of wealth.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Acquisition of power.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Acquisition of mayonnaise",
+            "is_correct": false
+          }
+        ]
+      }
+    ],
+    "other": []
+  },
+  "floppybird": {
+    "fixed_order": [
+      {
+        "source": "static",
+        "question": "What is the meaning of life?",
+        "choices": [
+          {
+            "prompt": "Potato.",
+            "is_correct": true
+          },
+          {
+            "prompt": "Acquisition of wealth.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Acquisition of power.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Acquisition of mayonnaise",
+            "is_correct": false
+          }
+        ]
+      }
+    ],
+    "other": []
+  }
 }

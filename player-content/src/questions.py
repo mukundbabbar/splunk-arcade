@@ -1,38 +1,11 @@
 import json
 import os
-from random import choice, randint, random
+from random import randint
 
 from redis import StrictRedis
 
 SPLUNK_OBSERVABILITY_REALM = os.getenv("SPLUNK_OBSERVABILITY_REALM", "us1")
-
-# for now, 30% of the time we'll try to use a ai gen question
-OPENAI_QUESTION_CHANCE_THRESHOLD = 0.3
-MAX_QUESTION_SELECTION_ATTEMPTS = 15
-
-# mapping is obviously game, then count of seen questions: index of question to show (as in the
-# position in the array of the questions.json for the given game)
-# a: b
-# a = position in json (under game, with is_fixed_position=true
-# b = question order
-FIXED_POSITION_QUESTIONS = {
-    "imvaders": {
-        0: 0,
-        1: 1,
-        2: 2,
-        3: 3,
-        4: 4,
-    },
-    "logger": {
-        0: 0,
-        1: 1,
-        2: 2,
-        3: 3,
-        4: 4,
-    },
-    "bughunt": {},
-    "floppybird": {},
-}
+MAX_QUESTION_SELECTION_ATTEMPTS = 5
 
 
 class _Questions:
@@ -54,77 +27,34 @@ class _Questions:
             decode_responses=True,
         )
 
-    def _get_random_generated_question_for_module(
-        self,
-        module: str,
-        player_name: str,
-    ) -> dict | None:
-        key_namespace = f"content:quiz:{module}:{player_name}:*"
-
-        found_keys = self.redis.keys(pattern=key_namespace)
-        if not found_keys:
-            return None
-
-        random_key = choice(found_keys)
-
-        loaded_content = self.redis.hgetall(random_key)
-        loaded_content["choices"] = json.loads(loaded_content["choices"])
-
-        return loaded_content
-
-    def _get_random_static_question_for_module(
-        self,
-        module: str,
-    ) -> dict | None:
-        while True:
-            maybe_question = self.content[module][randint(0, len(self.content[module]) - 1)]
-            if maybe_question.get("is_fixed_position"):
-                continue
-
-            return maybe_question
-
-    def random_question_for_module(
-        self, module: str, seen_questions: [str], player_name: str
-    ) -> dict:
+    def questions_for_module(  # noqa: C901
+        self, module: str, question_count: int, seen_questions: list[str], player_name: str
+    ) -> list[dict]:
         _module = module.lower()
 
         if _module not in self.content:
-            # in the future we may need/want to check dynamic questions as we may not even have
-            # "static" questions, but for now this is a safe check to ensure we dont try to load
-            # a question for some module (game) that doesnt exist
             raise Exception(f"module '{module}' is not in questions bank")
 
-        fixed_question_data = FIXED_POSITION_QUESTIONS.get(_module, None)
-        if fixed_question_data:
-            maybe_fixed_question_index = fixed_question_data.get(len(seen_questions), None)
-            if maybe_fixed_question_index is not None:
-                the_question = self.content[module][maybe_fixed_question_index]
-                the_question["question"] = the_question["question"].replace(
-                    "__PLAYER_NAME__", player_name
-                )
-                if "link" in the_question:
-                    the_question["link"] = the_question["link"].replace(
-                        "__PLAYER_NAME__", player_name
-                    )
-                    the_question["link"] = the_question["link"].replace(
-                        "__REALM__",
-                        SPLUNK_OBSERVABILITY_REALM,
-                    )
-
-                return the_question
-
-        attempts = 0
+        fixed_questions = self.content.get(_module, {}).get("fixed_order", [])
+        fixed_counter = 0
+        iters = 0
+        out_questions = []
 
         while True:
-            if random() < OPENAI_QUESTION_CHANCE_THRESHOLD:
-                maybe_question = self._get_random_generated_question_for_module(
-                    module=_module,
-                    player_name=player_name,
-                )
-            else:
-                maybe_question = self._get_random_static_question_for_module(
-                    module=_module,
-                )
+            maybe_question = None
+
+            if (len(seen_questions) + fixed_counter) < len(fixed_questions):
+                maybe_question = fixed_questions[len(seen_questions) + fixed_counter]
+                fixed_counter += 1
+            elif (len(seen_questions) + len(out_questions)) < len(fixed_questions) + len(
+                self.content[module]["other"]
+            ):
+                while True:
+                    maybe_question = self.content[module]["other"][
+                        randint(0, len(self.content[module]) - 1)
+                    ]
+                    if maybe_question["question"] not in seen_questions:
+                        break
 
             if maybe_question and maybe_question["question"] not in seen_questions:
                 maybe_question["question"] = maybe_question["question"].replace(
@@ -139,11 +69,16 @@ class _Questions:
                         SPLUNK_OBSERVABILITY_REALM,
                     )
 
-                return maybe_question
+                out_questions.append(maybe_question)
 
-            attempts += 1
+            if len(out_questions) >= question_count:
+                return out_questions
 
-            if attempts > MAX_QUESTION_SELECTION_ATTEMPTS:
-                # lets not try forever... if we didnt get a not seen question in this amount of
-                # attempts we can be done for now...
-                return {}
+            iters += 1
+
+            if iters > MAX_QUESTION_SELECTION_ATTEMPTS:
+                # couldnt find all the questions requested, if we have some, ship em otherwise
+                # just return an empty list for front end to deal with
+                if out_questions:
+                    return out_questions
+                return []

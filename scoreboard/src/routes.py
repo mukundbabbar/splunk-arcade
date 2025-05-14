@@ -9,13 +9,19 @@ from src.metrics import metric_factory
 
 routes = Blueprint("routes", __name__)
 
-NUM_IMVADERS_QUESTIONS_TO_UNLOCK_VERSION_1_75 = 3
-NUM_LOGGERS_QUESTIONS_TO_UNLOCK_VERSION_4_20 = 3
-
-NUM_QUESTIONS_TO_UNLOCK_NEXT = {
-    "imvaders": 5,
+GAME_VERSIONS = {
+    "imvaders": [
+        # tuple is question count (total) -> verison unlocked
+        (0, "0.5"),
+        (3, "0.75"),
+        (6, "1.0"),
+    ],
+    "logger": [
+        (0, "0.5"),
+        (3, "0.75"),
+        (6, "1.0"),
+    ],
 }
-DEFAULT_NUM_QUESTIONS_TO_UNLOCK_NEXT = 5
 
 
 @routes.route("/alive", methods=["GET"])
@@ -168,27 +174,19 @@ def get_player_progression():
     ]
 
     for index, module in enumerate(modules[:-1]):
-        num_questions_to_unlock_next = NUM_QUESTIONS_TO_UNLOCK_NEXT.get(
-            module, DEFAULT_NUM_QUESTIONS_TO_UNLOCK_NEXT
-        )
-
         question_keys = redis.scan_iter(match=f"quiz:{player_name}:{module}:*")
 
         question_count = sum(1 for _ in question_keys)
 
-        if question_count >= num_questions_to_unlock_next:
-            progression["level_state"][modules[index + 1]] = "unlocked"
+        for idx, (required_question_count, version_to_set) in enumerate(GAME_VERSIONS[module]):
+            if question_count >= required_question_count:
+                progression["game_versions"][module] = version_to_set
 
-        if module == "imvaders" and question_count >= NUM_IMVADERS_QUESTIONS_TO_UNLOCK_VERSION_1_75:
-            progression["game_versions"]["imvaders"] = 1.75
+                if idx == len(GAME_VERSIONS[module]) - 1:
+                    progression["level_state"][modules[index + 1]] = "unlocked"
 
-        if module == "logger" and question_count >= NUM_LOGGERS_QUESTIONS_TO_UNLOCK_VERSION_4_20:
-            progression["game_versions"]["logger"] = 4.20
-
-    if (
-        progression["level_state"]["logger"] == "unlocked"
-        and progression["level_state"]["bughunt"] == "unlocked"
-    ):
+    if progression["level_state"]["bughunt"] == "unlocked":
+        # if they unlocked bughunt we unlock everything
         progression["level_state"]["doom"] = "unlocked"
         progression["level_state"]["floppybird"] = "unlocked"
         progression["level_state"]["zelda"] = "unlocked"
