@@ -84,6 +84,8 @@
                             const question_content = response[currentQuestionIndex];
                             window.questionSource = question_content.source;
                             const question = question_content.question;
+                            const question_link = question_content.link;
+                            const question_link_text = question_content.link_text;
                             const optionsList = document.createElement("ul");
                             optionsList.classList.add("space-y-2");
 
@@ -204,13 +206,13 @@
 
                             const content = document.createElement("div");
                             content.classList.add("space-y-4");
-                            content.innerHTML = `<p id="quiz-question" class="text-lg font-medium">${question}</p><hr class="border-gray-600 my-4">`;
+                            content.innerHTML = `<p id="quiz-question" class="text-lg font-medium">${question}</p>`;
 
-                            if (response.link) {
+                            if (question_link && question_link_text) {
                                 const linkElement = document.createElement("a");
-                                linkElement.href = response.link;
+                                linkElement.href = question_link;
                                 linkElement.target = "_blank";
-                                linkElement.textContent = response.link_text;
+                                linkElement.textContent = question_link_text;
                                 linkElement.classList.add("text-cyan-400", "hover:text-cyan-500", "block", "mt-4", "text-center");
                                 content.appendChild(linkElement);
 
