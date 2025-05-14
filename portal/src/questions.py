@@ -77,8 +77,8 @@ def _handle_splunk_webhook_content(app, payload: dict[str, Any]) -> None:
     question = {
         "source": QUESTION_SOURCE_WEBHOOK_AND_SCRIPT,
         "question": question_data["question"],
-        "link": "",
-        "link_text": "",
+        "link": question_data.get("link", ""),
+        "link_text": question_data.get("link_text", ""),
         "choices": [
             {
                 "prompt": question_data["answer"],
