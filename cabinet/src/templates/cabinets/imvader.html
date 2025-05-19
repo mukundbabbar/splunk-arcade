@@ -75,12 +75,6 @@
           Version: version,
         });
 
-        const question_counts = {
-          "0.5": 3,
-          "0.75": 3,
-          "1.0": 3,
-        }
-
         // Player
         const player = {
           x: 375,
@@ -585,10 +579,15 @@
 
               if (lives <= 0) {
                 gameOver = true;
-
-                unlockQuizQuestions(question_counts[version]);
-
                 postState();
+
+                let question_count = 1;
+
+                if (["0.5", "0.75", "1.0"].includes(version)) {
+                  question_count = 3;
+                }
+
+                redirectToQuestions("imvaders", question_count);
               }
             }
           });

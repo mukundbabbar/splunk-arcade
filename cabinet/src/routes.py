@@ -113,6 +113,32 @@ def game():
     )
 
 
+@routes.route("/questions", methods=["GET", "POST"])
+@login_required
+def questions():
+    if not current_user.is_authenticated:
+        return redirect(url_for("routes.login"))
+
+    module = request.args.get('module')
+    question_count = request.args.get('question_count')
+
+    content = requests.get(
+        f"http://{PLAYER_CONTENT_HOST}/quiz/questions/{module}/{question_count}",
+        headers={
+            "Player-Name": PLAYER_NAME,
+        },
+    )
+
+    return render_template(
+        "questions.html",
+        user_username=current_user.username,
+        scoreboard_endpoint=f"http://{ARCADE_HOST}/scoreboard",
+        logout_endpoint=f"http://{ARCADE_HOST}/logout",
+        dashboard_home_endpoint=FINAL_DASHBOARD_URL,
+        question_content=content.json(),
+    )
+
+
 @routes.route("/record_game_score/", methods=["POST"])
 def record_game_score():
     content = request.get_json(force=True)
@@ -147,28 +173,18 @@ def record_game_score():
     return {}
 
 
-@routes.route("/question_set/<string:module>/<int:question_count>/", methods=["GET"])
-def get_questions(module: str, question_count: int):
-    content = requests.get(
-        f"http://{PLAYER_CONTENT_HOST}/quiz/questions/{module}/{question_count}",
-        headers={
-            "Player-Name": PLAYER_NAME,
-        },
-    )
-    # TODO we used to do some other check for dashboard link but i think we dont need anymore?
-    return content.json()
-
-
 @routes.route("/answer", methods=["POST"])
 def record_answer():
     content = request.get_json(force=True)
+
+    print("CONTENT > ", content)
 
     ret = requests.post(
         f"http://{SCOREBOARD_HOST}/record_quiz_score/",
         json=content,
     )
 
-    print(f"record quiz score status {ret.status_code}")
+    print(f"record quiz score status {ret.status_code}, text: {ret.text}")
 
     return {}
 
@@ -220,6 +236,18 @@ def get_walkthrough(module: str, stage: str):
 def get_progression():
     ret = requests.get(
         f"http://{SCOREBOARD_HOST}/player_progression",
+        headers={
+            "Player-Name": PLAYER_NAME,
+        },
+    )
+
+    return ret.json()
+
+
+@routes.route("/question_available", methods=["GET"])
+def question_available():
+    ret = requests.get(
+        f"http://{SCOREBOARD_HOST}/question_available",
         headers={
             "Player-Name": PLAYER_NAME,
         },
