@@ -46,7 +46,6 @@ SPLUNK_OBSERVABILITY_API_ACCESS_TOKEN = os.getenv("SPLUNK_OBSERVABILITY_API_ACCE
 
 
 WAIT_ARCADE_CHOICES = [
-    "Initializing Terraform to provision your custom dashboards...",
     "Deploying your player's environment in the Kubernetes cluster...",
     "Compiling amphibious movement heuristics... 🐸",
     "Calibrating quantum log stability...",
@@ -63,9 +62,6 @@ def before_request():
         db.session.commit()
         session["username"] = found_user.username
         session["user_id"] = found_user.id
-        session["first_name"] = found_user.first_name
-        session["last_name"] = found_user.last_name
-        session["email"] = found_user.email
 
 
 @routes.route("/alive", methods=["GET"])
@@ -115,10 +111,7 @@ def login():
             # ensure devplayer user exists
             devplayer_user = User(
                 username="devplayer",
-                email="devplayer@splunk.com",
                 uuid=uuid.uuid4(),
-                first_name="dev",
-                last_name="player",
             )
             devplayer_user.set_password("password")
             db.session.add(devplayer_user)
@@ -170,10 +163,7 @@ def register():
     if form.validate_on_submit():
         user = User(
             username=form.username.data,
-            email=form.email.data,
             uuid=uuid.uuid4(),
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
         )
         user.set_password(form.password.data)
         db.session.add(user)

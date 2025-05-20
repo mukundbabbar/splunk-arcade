@@ -132,6 +132,7 @@ def questions():
     return render_template(
         "questions.html",
         user_username=current_user.username,
+        module=module,
         scoreboard_endpoint=f"http://{ARCADE_HOST}/scoreboard",
         logout_endpoint=f"http://{ARCADE_HOST}/logout",
         dashboard_home_endpoint=FINAL_DASHBOARD_URL,
@@ -176,8 +177,6 @@ def record_game_score():
 @routes.route("/answer", methods=["POST"])
 def record_answer():
     content = request.get_json(force=True)
-
-    print("CONTENT > ", content)
 
     ret = requests.post(
         f"http://{SCOREBOARD_HOST}/record_quiz_score/",
@@ -236,18 +235,6 @@ def get_walkthrough(module: str, stage: str):
 def get_progression():
     ret = requests.get(
         f"http://{SCOREBOARD_HOST}/player_progression",
-        headers={
-            "Player-Name": PLAYER_NAME,
-        },
-    )
-
-    return ret.json()
-
-
-@routes.route("/question_available", methods=["GET"])
-def question_available():
-    ret = requests.get(
-        f"http://{SCOREBOARD_HOST}/question_available",
         headers={
             "Player-Name": PLAYER_NAME,
         },

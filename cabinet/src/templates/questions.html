@@ -5,6 +5,20 @@
 
         {% include 'head_content.html' %}
 
+        <style>
+        body.blur-background::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 40;
+        }
+        </style>
+
         <script>
           let startTime = null;
           let attemptsCount = 0;
@@ -12,8 +26,11 @@
           let currentQuestionIndex = 0;
 
           function showNextQuestion() {
+            if (currentQuestionIndex > questions.length - 1) {
+              window.location.href =  "{{ url_for('routes.home') }}";
+            }
+
             const question_content = questions[currentQuestionIndex];
-            window.questionSource = question_content.source;
             const question = question_content.question;
             const question_link = question_content.link;
             const question_link_text = question_content.link_text;
@@ -74,6 +91,7 @@
                           url: '{{ url_for("routes.record_answer") }}',
                           data: JSON.stringify({
                               player_name: "{{ user_username }}",
+                              title: "{{ module }}",
                               question: quizQuestion,
                               attempts: attemptsCount,
                               time_taken: timeTaken,
@@ -131,34 +149,37 @@
 
             const existingFeedback = document.getElementById("question-feedback-box");
             if (existingFeedback) {
-                existingFeedback.remove();
+              existingFeedback.remove();
             }
+
+            document.body.classList.add("blur-background");
 
             const feedbackElement = document.createElement("div");
             feedbackElement.id = "question-feedback-box";
             feedbackElement.classList.add(
-                "bg-pink-500", "text-white", "absolute", "left-1/2",
-                "transform", "-translate-x-1/2", "px-6", "py-4", "text-center",
-                "rounded-lg", "shadow-lg", "z-[9999]", "max-w-md", "w-full"
+              "fixed", "left-1/2", "top-1/2", "transform", "-translate-x-1/2", "-translate-y-1/2",
+              "bg-pink-500", "text-white", "px-6", "py-4", "text-center",
+              "rounded-lg", "shadow-lg", "z-[9999]", "max-w-md", "w-full"
             );
 
             const messageContent = document.createElement("div");
             messageContent.textContent = `Wrong answer. Try again!`;
-
             messageContent.classList.add("mb-4");
 
             const closeButton = document.createElement("button");
             closeButton.textContent = "OK";
             closeButton.classList.add(
-                "bg-white", "text-pink-500", "px-4", "py-2", "rounded-lg",
-                "font-bold", "cursor-pointer", "hover:bg-gray-200"
+              "bg-white", "text-pink-500", "px-4", "py-2", "rounded-lg",
+              "font-bold", "cursor-pointer", "hover:bg-gray-200"
             );
 
-            closeButton.onclick = () => feedbackElement.remove();
+            closeButton.onclick = () => {
+              feedbackElement.remove();
+              document.body.classList.remove("blur-background");
+            };
 
             feedbackElement.appendChild(messageContent);
             feedbackElement.appendChild(closeButton);
-
             main.appendChild(feedbackElement);
           }
 

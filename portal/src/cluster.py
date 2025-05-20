@@ -165,7 +165,7 @@ def player_deployment_create(player_id: str, observability_realm: str) -> None:
                                     container_port=5_000,
                                 ),
                             ],
-                            liveness_probe=client.V1Probe(
+                            readiness_probe=client.V1Probe(
                                 http_get=client.V1HTTPGetAction(
                                     path="/alive", port="http", scheme="HTTP"
                                 ),

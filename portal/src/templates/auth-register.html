@@ -22,35 +22,11 @@
                     {{ form.hidden_tag() }}
 
                     <div class="mb-4">
-                        <label for="first_name" class="text-gray-300">
-                            {{ form.first_name.label }}
-                        </label>
-                        {{ form.first_name(size=32, class_="form-control bg-gray-600 text-gray-100 rounded-md p-2 w-full mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="last_name" class="text-gray-300">
-                            {{ form.last_name.label }}
-                        </label>
-                        {{ form.last_name(size=32, class_="form-control bg-gray-600 text-gray-100 rounded-md p-2 w-full mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
-                    </div>
-
-                    <div class="mb-4">
                         <label for="username" class="text-gray-300">
                             {{ form.username.label }}
                         </label>
                         {{ form.username(size=32, class_="form-control bg-gray-600 text-gray-100 rounded-md p-2 w-full mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
                         {% for error in form.username.errors %}
-                        <span class="text-red-500 text-sm">[{{ error }}]</span>
-                        {% endfor %}
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="email" class="text-gray-300">
-                            {{ form.email.label }}
-                        </label>
-                        {{ form.email(size=32, class_="form-control bg-gray-600 text-gray-100 rounded-md p-2 w-full mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent") }}
-                        {% for error in form.email.errors %}
                         <span class="text-red-500 text-sm">[{{ error }}]</span>
                         {% endfor %}
                     </div>
@@ -83,22 +59,6 @@
                         {% for error in form.password2.errors %}
                         <span class="text-red-500 text-sm">[{{ error }}]</span>
                         {% endfor %}
-                    </div>
-
-                    <div class="flex justify-center">
-                        <div class="mb-4">
-                            <div class="flex items-center">
-                                {{ form.accept_tos(class="form-check-input bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-500 mt-1 mr-2") }}
-                                <div>
-                                    <label class="text-gray-300">
-                                        {{ form.accept_tos.label }}
-                                    </label>
-                                </div>
-                            </div>
-                            {% for error in form.accept_tos.errors %}
-                            <span class="text-red-500 text-sm">[{{ error }}]</span>
-                            {% endfor %}
-                        </div>
                     </div>
 
                     <div class="text-center mt-4">

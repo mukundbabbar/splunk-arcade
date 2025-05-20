@@ -26,14 +26,13 @@ async def get_questions(
         f"http://{SCOREBOARD_HOST}/player_seen_questions/{module}",
         headers={"Player-Name": player_name},
     )
-    seen_questions = seen_questions_resp.json()
 
     q = _Questions()
     return JSONResponse(
         content=q.questions_for_module(
             module=module,
             question_count=question_count,
-            seen_questions=seen_questions,
+            seen_questions=seen_questions_resp.json(),
             player_name=player_name,
         )
     )
