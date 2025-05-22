@@ -14,23 +14,9 @@ Base = declarative_base()
 
 class User(UserMixin, db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
-    email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
-    first_name: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-    last_name: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-
     password_hash: so.Mapped[str | None] = so.mapped_column(sa.String(256))
     uuid: so.Mapped[str | None] = so.mapped_column(sa.String(256))
-    about_me: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-    linkedin: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-    github: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-    twitter: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-    url: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-    company: so.Mapped[str | None] = so.mapped_column(sa.String(140))
-    last_seen: so.Mapped[datetime | None] = so.mapped_column(default=lambda: datetime.now(UTC))
-
-    posts: so.WriteOnlyMapped["Post"] = so.relationship(back_populates="author")
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -40,19 +26,3 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-    def avatar(self, size):
-        digest = md5(self.email.lower().encode("utf-8")).hexdigest()
-        return f"https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}"
-
-
-class Post(db.Model):
-    id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    body: so.Mapped[str] = so.mapped_column(sa.String(140))
-    timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(UTC))
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
-
-    author: so.Mapped[User] = so.relationship(back_populates="posts")
-
-    def __repr__(self):
-        return f"<Post {self.body}>"

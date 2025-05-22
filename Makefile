@@ -41,7 +41,7 @@ build-tailwind: ## Builds tailwind css output files for ui components
 	cd portal && npm run tailwind-build
 
 clean-pvcs: ## Cleanup any pvcs for redis/postgres
-	kubectl delete pvc \
+	kubectl delete pvc --namespace splunk-arcade \
 		data-splunk-arcade-postgresql-0 \
 		data-splunk-arcade-postgresql-primary-0 \
 		data-splunk-arcade-postgresql-read-0 \
@@ -55,23 +55,11 @@ clean-pvcs: ## Cleanup any pvcs for redis/postgres
 		redis-data-splunk-arcade-redis-replicas-2 || true
 
 clean-players: ## Cleanup any created player deployments
-	kubectl get deployments -l "app.kubernetes.io/name=splunk-arcade-cabinet" \
+	kubectl get deployments --namespace splunk-arcade -l "app.kubernetes.io/name=splunk-arcade-cabinet" \
 		--no-headers -o custom-columns=":metadata.name" \
-		| xargs -I {} kubectl delete deployment {}
-	kubectl get services -l "app.kubernetes.io/name=splunk-arcade-cabinet" \
+		| xargs -I {} kubectl delete deployment --namespace splunk-arcade {}
+	kubectl get services --namespace splunk-arcade  -l "app.kubernetes.io/name=splunk-arcade-cabinet" \
 		--no-headers -o custom-columns=":metadata.name" \
-		| xargs -I {} kubectl delete service {}
-	kubectl get jobs -l "app.kubernetes.io/name=splunk-arcade-player-cloud" \
-		--no-headers -o custom-columns=":metadata.name" \
-		| xargs -I {} kubectl delete jobs {}
+		| xargs -I {} kubectl delete service --namespace splunk-arcade {}
 
-clean-hanging-configmaps-and-secrets: ## Cleans any secrets/configmaps that didnt get cleaned up
-	kubectl get configmaps -l "app.kubernetes.io/name=splunk-arcade-player-cloud-outputs" \
-		--no-headers -o custom-columns=":metadata.name" \
-		| xargs -I {} kubectl delete configmaps {}
-	kubectl get secrets -l "app.kubernetes.io/name=splunk-arcade-player-cloud-state" \
-		--no-headers -o custom-columns=":metadata.name" \
-		| xargs -I {} kubectl delete secrets {}
-
-
-clean-all: clean-players clean-hanging-configmaps-and-secrets clean-pvcs ## Cleanup all cruft from cluster
+clean-all: clean-players clean-pvcs ## Cleanup all cruft from cluster

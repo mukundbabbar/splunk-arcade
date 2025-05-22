@@ -120,7 +120,6 @@ def record_quiz_score():
     redis.hmset(
         f"quiz:{quiz_update["player_name"]}:"
         + f"{quiz_update["title"]}:"
-        + f"{quiz_update["game_session_id"]}:"
         + f"{get_question_hash(question=quiz_update["question"])}",
         quiz_update,
     )
