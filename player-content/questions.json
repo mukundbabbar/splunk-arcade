@@ -69,7 +69,8 @@
             "prompt": "The game is experiencing a bug in score calculation.",
             "is_correct": false
           }
-        ]
+        ],
+        "post_prompt": "this text goes after the question and the feedback form!"
       },
       {
         "source": "static",
@@ -141,7 +142,8 @@
             "prompt": "splunk-arcade-scoreboard, postgres, redis",
             "is_correct": false
           }
-        ]
+        ],
+        "post_prompt": "this text goes after the question and the feedback form!"
       }
     ],
     "other": [
