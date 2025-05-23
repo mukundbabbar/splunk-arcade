@@ -3,31 +3,104 @@
     "fixed_order": [
       {
         "source": "static",
-        "question": "1: What version of the IMVaders game is more error-prone than the other versions?",
-        "link_text": "Click here to investigate using indexed tags in Splunk APM",
-        "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
+        "question": "1: Who has the all time top score in v0.5?",
+        "link_text": "Click here to investigate in your Arcade dashboard in Splunk Observability Cloud",
+        "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
           {
-            "prompt": ".25",
+            "prompt": "Batman",
             "is_correct": false
           },
           {
-            "prompt": ".5",
+            "prompt": "DouglasAdams",
             "is_correct": false
           },
           {
-            "prompt": "1.0",
+            "prompt": "Rutger-Hauer",
             "is_correct": false
           },
           {
-            "prompt": ".75",
+            "prompt": "Buttercup",
             "is_correct": true
           }
         ]
       },
       {
         "source": "static",
-        "question": "2: Which endpoint is the culprit of all of those errors?",
+        "question": "2: What is the name of the metric tracking player score?",
+        "link_text": "Investigate in your Arcade dashboard by clicking into a score chart",
+        "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
+        "choices": [
+          {
+            "prompt": "arcade.score",
+            "is_correct": false
+          },
+          {
+            "prompt": "invaders.cabinet.score",
+            "is_correct": false
+          },
+          {
+            "prompt": "score.imvaders.arcade",
+            "is_correct": false
+          },
+          {
+            "prompt": "arcade.imvaders.score",
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "3: What is the name of the database connected to splunk-arcade-cabinet-player-__PLAYER_NAME__ service?",
+        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map (If you died quickly you may be faster than your data. Refresh the dashboard after a brief pause).",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
+        "choices": [
+          {
+            "prompt": "postgresql",
+            "is_correct": true
+          },
+          {
+            "prompt": "MySQL",
+            "is_correct": false
+          },
+          {
+            "prompt": "DynamoDb",
+            "is_correct": false
+          },
+          {
+            "prompt": "OracleDb",
+            "is_correct": false
+          }
+        ],
+        "post_prompt": "Conglaturation! We'd like you to try a newer version (0.75) of Space Imvaders! Ready Player 1!"
+      },
+      {
+        "source": "static",
+        "question": "4: Oops we may have introduced some bugs in version 0.75! Customers are saying they can’t enough projectiles. What metric could you use to verify this and perhaps even compare versions to each other?",
+        "link_text": "Check the Metric Finder for Imvader available metrics. To further investigate that metric click on its name and enter a chart builder. \nTo compare versions click the “Add analytics” button and choose Sum -> Sum:aggregation -> Group By: version",
+        "link": "https://app.us1.signalfx.com/#/metrics?query=arcade.imvaders ",
+        "choices": [
+          {
+            "prompt": "imvaders.shots",
+            "is_correct": false
+          },
+          {
+            "prompt": "arcade.imvaders.level",
+            "is_correct": false
+          },
+          {
+            "prompt": "arcade.imvaders.projectiles",
+            "is_correct": true
+          },
+          {
+            "prompt": "arcade.imvaders.score",
+            "is_correct": false
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "5. The scoreboard service seems to be experiencing a lot of errors on one of the endpoints. Can you identify which endpoint it is?",
         "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
         "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
         "choices": [
@@ -51,102 +124,79 @@
       },
       {
         "source": "static",
-        "question": "3: If the projectile count is unusually high but scores are low, what might that indicate?",
+        "question": "6: What can we learn from the charts in our dashboard comparing the different versions of the game?",
+        "link_text": "Investigate in your Arcade dashboard",
+        "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
           {
-            "prompt": "Players might be missing the alien targets frequently.",
+            "prompt": "I need to get better at version 0.75",
+            "is_correct": false
+          },
+          {
+            "prompt": "0.75 is faster than 0.50",
+            "is_correct": false
+          },
+          {
+            "prompt": "v0.75 scores are, on average, lower than the v0.50 scores",
             "is_correct": true
           },
           {
-            "prompt": "Players are winning too easily.",
-            "is_correct": false
-          },
-          {
-            "prompt": "The game is running too fast.",
-            "is_correct": false
-          },
-          {
-            "prompt": "The game is experiencing a bug in score calculation.",
+            "prompt": "0.50 has more enemies",
             "is_correct": false
           }
         ],
-        "post_prompt": "this text goes after the question and the feedback form!"
-      },
-      {
-        "source": "static",
-        "question": "4: What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
-        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
-        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
-        "choices": [
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
-            "is_correct": false
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
-            "is_correct": false
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, posgres, redis",
-            "is_correct": true
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, postgres, redis",
-            "is_correct": false
-          }
-        ]
-      },
-      {
-        "source": "static",
-        "question": "5: What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
-        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
-        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
-        "choices": [
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
-            "is_correct": false
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
-            "is_correct": false
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, posgres, redis",
-            "is_correct": true
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, postgres, redis",
-            "is_correct": false
-          }
-        ]
-      },
-      {
-        "source": "static",
-        "question": "6: What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
-        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
-        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
-        "choices": [
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
-            "is_correct": false
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
-            "is_correct": false
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, posgres, redis",
-            "is_correct": true
-          },
-          {
-            "prompt": "splunk-arcade-scoreboard, postgres, redis",
-            "is_correct": false
-          }
-        ],
-        "post_prompt": "this text goes after the question and the feedback form!"
+        "post_prompt": "Thank you for your help with version 0.75! We're releasing 1.0 and would like you to play it! Ready? Go!"
       }
     ],
     "other": [
+      {
+        "source": "static",
+        "question": "What version of the IMVaders game is more error-prone than the other versions?",
+        "link_text": "Click here to investigate using indexed tags in Splunk APM",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
+        "choices": [
+          {
+            "prompt": ".25",
+            "is_correct": false
+          },
+          {
+            "prompt": ".5",
+            "is_correct": false
+          },
+          {
+            "prompt": "1.0",
+            "is_correct": false
+          },
+          {
+            "prompt": ".75",
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
+        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
+        "choices": [
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-portal, postgres, redis",
+            "is_correct": false
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, splunk-arcade-player-content, postgres, redis",
+            "is_correct": true
+          },
+          {
+            "prompt": "splunk-arcade-scoreboard, postgres, redis",
+            "is_correct": false
+          }
+        ]
+      },
       {
         "source": "static",
         "question": "Are player score and projectile count sufficient to evaluate player performance?",
