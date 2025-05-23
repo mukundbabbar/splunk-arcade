@@ -22,16 +22,23 @@ versions = ["0.5", "0.75", "1.0"]
 def generate():
     while True:
         player = random.choice(players)
+        version = random.choice(versions)
 
         if player == "buttercup":
-            score = 999_999
+            probability = random.randint(1, 100)
+            if probability > 70:
+                score = 9_999
+            else: 
+                score = random.randint(100, 2000)
+        elif version == "0.75":
+            score = random.randint(10, 200) # we want 0.75 to have lower scores on average
         else:
-            score = random.randint(10, 200)
+            score = random.randint(100, 2000)
 
         scoreboard_update = {
             "title": "imvaders",
             "player_name": player,
-            "version": random.choice(versions),
+            "version": version,
             "current_score": score,
         }
 
