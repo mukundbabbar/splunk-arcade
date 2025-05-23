@@ -34,6 +34,7 @@
             const question = question_content.question;
             const question_link = question_content.link;
             const question_link_text = question_content.link_text;
+            const question_post_prompt = question_content?.post_prompt ?? '';
             const optionsList = document.createElement("ul");
             optionsList.classList.add("space-y-2");
 
@@ -105,6 +106,12 @@
                               console.log('Error recording answer:', error);
                           }
                       });
+
+                      if (question_post_prompt !== "") {
+                        await showPostQuestionPrompt(question_post_prompt);
+
+                        window.location.href =  "{{ url_for('routes.home') }}";
+                      }
 
                       startTime = null;
                       attemptsCount = 0;
@@ -266,6 +273,48 @@
                       console.log('Error recording feedback:', error);
                   }
               });
+          }
+
+          function showPostQuestionPrompt(question_post_prompt) {
+            return new Promise((resolve) => {
+              const main = document.getElementById("question-container");
+
+              const existingFeedback = document.getElementById("post-question-prompt-box");
+              if (existingFeedback) {
+                existingFeedback.remove();
+              }
+
+              document.body.classList.add("blur-background");
+
+              const feedbackElement = document.createElement("div");
+              feedbackElement.id = "post-question-prompt-box";
+              feedbackElement.classList.add(
+                "fixed", "left-1/2", "top-1/2", "transform", "-translate-x-1/2", "-translate-y-1/2",
+                "bg-pink-500", "text-white", "px-6", "py-4", "text-center",
+                "rounded-lg", "shadow-lg", "z-[9999]", "max-w-md", "w-full"
+              );
+
+              const messageContent = document.createElement("div");
+              messageContent.textContent = question_post_prompt;
+              messageContent.classList.add("mb-4");
+
+              const closeButton = document.createElement("button");
+              closeButton.textContent = "OK";
+              closeButton.classList.add(
+                "bg-white", "text-pink-500", "px-4", "py-2", "rounded-lg",
+                "font-bold", "cursor-pointer", "hover:bg-gray-200"
+              );
+
+              closeButton.onclick = () => {
+                feedbackElement.remove();
+                document.body.classList.remove("blur-background");
+                resolve();
+              };
+
+              feedbackElement.appendChild(messageContent);
+              feedbackElement.appendChild(closeButton);
+              main.appendChild(feedbackElement);
+            })
           }
 
           document.addEventListener("DOMContentLoaded", function () {

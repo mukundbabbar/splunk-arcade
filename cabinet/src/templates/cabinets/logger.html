@@ -58,7 +58,7 @@
             #canvas {
                 z-index: 2;
             }
-            
+
             #foreground-canvas {
                 z-index: 3
             }
@@ -100,7 +100,7 @@
 
                             // Get a reference to the background <canvas> element's 2-D drawing surface context
                             backgroundDrawingSurface = backgroundCanvas.getContext("2d"),
-                            
+
                             // Set a foreground, for the game over screen
                             foregroundCanvas = document.getElementById("foreground-canvas"),
                             foregroundDrawingSurface = foregroundCanvas.getContext("2d"),
@@ -541,7 +541,6 @@
                                 type: "GET",
                                 url: '{{ url_for("routes.get_logger_shrink_state") }}',
                                 success: function (response) {
-                                    console.log("RESPONSE >>> ", response);
                                     if (response.shrink) {
                                         enableShrinkify = true;
                                     } else {
@@ -1077,28 +1076,7 @@
                             Frogger.foregroundDrawingSurface.textAlign = "center";
                             Frogger.foregroundDrawingSurface.fillStyle = "#FFF";
 
-                            // Write the text center aligned within the <canvas> and at the 9th row position
-                            // from the top of the game board
-                            pauseLoop = true;
-                            unlockQuizQuestions(3);
-
-                            const text = "GAME OVER!\nPress C to Continue";
-
-                            const lines = text.split("\n");
-                            lines.forEach((line, i) => {
-                                Frogger.foregroundDrawingSurface.fillText(line, Frogger.drawingSurfaceWidth / 2, _gameBoard.rows[8+i]);
-                            });
-
-                            function handleContinue(event) {
-                                if (event.code === "KeyC") {
-                                    pauseLoop = false;
-                                    endLoop = true;
-                                    document.removeEventListener("keydown", handleContinue);
-                                    runLogger();
-                                }
-                            }
-
-                            document.addEventListener("keydown", handleContinue);
+                            redirectToQuestions("logger", 1);
                         }
 
                         // Define a function to render the text "YOU WIN!" to the <canvas> which will be called
@@ -1121,7 +1099,6 @@
                             Frogger.foregroundDrawingSurface.fillText("YOU WIN!", Frogger.drawingSurfaceWidth / 2, _gameBoard.rows[8]);
 
                             pauseLoop = true;
-                            unlockQuizQuestions(3);
 
                             const text = "YOU WIN!\nPress C to Play Again";
 
