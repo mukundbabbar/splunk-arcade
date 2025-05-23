@@ -82,6 +82,21 @@ Make sure you're configured to use the `splunk-arcade` namespace before running 
 
 ---
 
+### Troubleshooting Local Dev
+
+Below are some common troubleshooting steps:
+
+#### Add splunk-arcade.home to /etc/hosts
+Adding an entry mapping splunk-arcade.home to 127.0.0.1 can be helpful to ease static domain resolution issues
+
+#### Verify your load balancer is not in a `<pending>` state
+This can happen if you are using something like [minikube](https://minikube.sigs.k8s.io/docs/commands/tunnel/) or [kind](https://kind.sigs.k8s.io/docs/user/loadbalancer) and have not setup tunneling.
+See those links for details.
+
+Conflicts with a local `traefik` service in the `kube-system` or similar namespace can als cause issues. 
+`kubectl get services --all-namespaces -o wide` can get you a list of all services. look for any of `TYPE` matching `LoadBalancer` and compare `PORT(S)` for any two load balancers trying to make the same ports available. Fix this by editing the deployment of that service or just with kubectl `kubectl edit service -n kube-system traefik `
+---
+
 ### Future Plans
 
 In the future, we can set up a cron job to automatically prune these resources after a certain period.
