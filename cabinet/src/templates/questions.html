@@ -30,6 +30,8 @@
               window.location.href =  "{{ url_for('routes.home') }}";
             }
 
+            startTime = new Date().getTime();
+
             const question_content = questions[currentQuestionIndex];
             const question = question_content.question;
             const question_link = question_content.link;
