@@ -3,7 +3,7 @@
     "fixed_order": [
       {
         "source": "static",
-        "question": "1: Who has the all time top score in v0.5?",
+        "question": "Who has the all time top score in v0.5?",
         "link_text": "Click here to investigate in your Arcade dashboard in Splunk Observability Cloud",
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
@@ -27,7 +27,7 @@
       },
       {
         "source": "static",
-        "question": "2: What is the name of the metric tracking player score?",
+        "question": "What is the name of the metric tracking player score?",
         "link_text": "Investigate in your Arcade dashboard by clicking into a score chart",
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
@@ -51,7 +51,7 @@
       },
       {
         "source": "static",
-        "question": "3: What is the name of the database connected to splunk-arcade-cabinet-player-__PLAYER_NAME__ service?",
+        "question": "What is the name of the database connected to splunk-arcade-cabinet-player-__PLAYER_NAME__ service?",
         "link_text": "Click here to see your game cabinet, and dependencies, in an APM map (If you died quickly you may be faster than your data. Refresh the dashboard after a brief pause).",
         "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
         "choices": [
@@ -76,7 +76,7 @@
       },
       {
         "source": "static",
-        "question": "4: Oops we may have introduced some bugs in version 0.75! Customers are saying they can’t enough projectiles. What metric could you use to verify this and perhaps even compare versions to each other?",
+        "question": "Oops we may have introduced some bugs in version 0.75! Customers are saying they can’t enough projectiles. What metric could you use to verify this and perhaps even compare versions to each other?",
         "link_text": "Check the Metric Finder for Imvader available metrics. To further investigate that metric click on its name and enter a chart builder. \nTo compare versions click the “Add analytics” button and choose Sum -> Sum:aggregation -> Group By: version",
         "link": "https://app.us1.signalfx.com/#/metrics?query=arcade.imvaders ",
         "choices": [
@@ -100,7 +100,7 @@
       },
       {
         "source": "static",
-        "question": "5. The scoreboard service seems to be experiencing a lot of errors on one of the endpoints. Can you identify which endpoint it is?",
+        "question": "The scoreboard service seems to be experiencing a lot of errors on one of the endpoints. Can you identify which endpoint it is?",
         "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
         "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
         "choices": [
@@ -124,7 +124,7 @@
       },
       {
         "source": "static",
-        "question": "6: What can we learn from the charts in our dashboard comparing the different versions of the game?",
+        "question": "What can we learn from the charts in our dashboard comparing the different versions of the game?",
         "link_text": "Investigate in your Arcade dashboard",
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
