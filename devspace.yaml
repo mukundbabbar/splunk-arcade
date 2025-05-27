@@ -365,4 +365,5 @@ pipelines:
       kubectl delete deployments -n ${DEVSPACE_NAMESPACE} registry || true
       kubectl delete statefulsets -n ${DEVSPACE_NAMESPACE} registry || true
       kubectl delete pvc -n ${DEVSPACE_NAMESPACE} registry-registry-0 || true
+      kubectl delete namespaces splunk-arcade ingress-nginx
 

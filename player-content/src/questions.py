@@ -6,6 +6,9 @@ from redis import StrictRedis
 
 SPLUNK_OBSERVABILITY_REALM = os.getenv("SPLUNK_OBSERVABILITY_REALM", "us1")
 MAX_QUESTION_SELECTION_ATTEMPTS = 5
+# Currently us1 points to a dashboard in Show Playground. 
+#!!!!!!! UPDATE THESE DASHBOARDS TO THE CORRECT ORGS ONCE DECIDED !!!!!!!!!
+ARCADE_O11Y_DASHBOARD = {"us1":"Grko8cDA0Ao?groupId=GjETzI8AwAE&startTime=-1h&endTime=Now", "eu0":"placeHolDeERid?groupId=PlAcEHoLDeRid"}
 
 
 class _Questions:
@@ -67,6 +70,10 @@ class _Questions:
                     maybe_question["link"] = maybe_question["link"].replace(
                         "__REALM__",
                         SPLUNK_OBSERVABILITY_REALM,
+                    )
+                    maybe_question["link"] = maybe_question["link"].replace(
+                            "__DASHBOARD__",
+                            ARCADE_O11Y_DASHBOARD.get(SPLUNK_OBSERVABILITY_REALM, "Grko8cDA0Ao?groupId=GjETzI8AwAE")
                     )
 
                 out_questions.append(maybe_question)
