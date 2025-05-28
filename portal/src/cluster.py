@@ -151,14 +151,6 @@ def player_deployment_create(player_id: str, observability_realm: str) -> None:
                                     value=observability_realm,
                                 ),
                             ],
-                            env_from=[
-                                client.V1EnvFromSource(
-                                    config_map_ref=client.V1ConfigMapEnvSource(
-                                        name=f"tf-outputs-{player_id}",
-                                        optional=True,
-                                    )
-                                )
-                            ],
                             ports=[
                                 client.V1ContainerPort(
                                     name="http",
@@ -167,7 +159,7 @@ def player_deployment_create(player_id: str, observability_realm: str) -> None:
                             ],
                             readiness_probe=client.V1Probe(
                                 http_get=client.V1HTTPGetAction(
-                                    path="/alive", port="http", scheme="HTTP"
+                                    path=f"/player/{player_id}/alive", port="http", scheme="HTTP"
                                 ),
                                 success_threshold=1,
                                 failure_threshold=2,
