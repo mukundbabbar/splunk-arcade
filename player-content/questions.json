@@ -403,22 +403,46 @@
     "fixed_order": [
       {
         "source": "static",
-        "question": "What type of information should be included in logs to understand player actions in the game?",
+        "question": "1. What is the `process.executable.name` associated with metrics coming from Logger ?",
+        "link_text": "Click here to investigate in your Arcade dashboard in Splunk Observability Cloud",
+        "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__ click into a data chart for more information on individual metrics",
         "choices": [
           {
-            "prompt": "Player ID, and actions like movements, collisions, and level completion.",
+            "prompt": "/usr/bin/splunk",
+            "is_correct": false
+          },
+          {
+            "prompt": "/bin/logger",
+            "is_correct": false
+          },
+          {
+            "prompt": "/usr/local/bin/cabinet",
+            "is_correct": false
+          },
+          {
+            "prompt": "/usr/local/bin/python",
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "2. What version of Logger are you playing?",
+        "choices": [
+          {
+            "prompt": "1.0.0",
             "is_correct": true
           },
           {
-            "prompt": "The color of the player’s frog.",
+            "prompt": "2",
             "is_correct": false
           },
           {
-            "prompt": "The background music being played.",
+            "prompt": "1.25.1",
             "is_correct": false
           },
           {
-            "prompt": "The version of kubernetes it is deployed in.",
+            "prompt": "The same version as our kubernetes cluster!",
             "is_correct": false
           }
         ]

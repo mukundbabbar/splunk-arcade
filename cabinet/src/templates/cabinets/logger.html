@@ -269,6 +269,8 @@
 
                             // Inform other code modules in this application that the game is over
                             Frogger.observer.publish("game-over");
+                            
+                            redirectToQuestions("logger", 1);
                         }
 
                         // Define a function to be called when the player has reached the goal
@@ -1075,8 +1077,6 @@
                             Frogger.foregroundDrawingSurface.font = _font;
                             Frogger.foregroundDrawingSurface.textAlign = "center";
                             Frogger.foregroundDrawingSurface.fillStyle = "#FFF";
-
-                            redirectToQuestions("logger", 1);
                         }
 
                         // Define a function to render the text "YOU WIN!" to the <canvas> which will be called
