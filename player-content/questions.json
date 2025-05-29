@@ -76,7 +76,7 @@
       },
       {
         "source": "static",
-        "question": "Oops we may have introduced some bugs in version 0.75! Customers are saying they cannot fire enough projectiles. What metric could you use to verify this and perhaps even compare versions to each other?",
+        "question": "Oops we may have introduced some bugs in version 0.75! Customers are saying they can’t fire enough projectiles. What metric could you use to verify this and perhaps even compare versions to each other?",
         "link_text": "Check the Metric Finder for Imvader available metrics. To further investigate that metric click on its name and enter a chart builder. \nTo compare versions click the “Add analytics” button and choose Sum -> Sum:aggregation -> Group By: version",
         "link": "https://app.us1.signalfx.com/#/metrics?query=arcade.imvaders ",
         "choices": [
