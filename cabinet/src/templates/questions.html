@@ -133,12 +133,34 @@
             content.innerHTML = `<p id="quiz-question" class="text-lg font-medium">${question}</p>`;
 
             if (question_link && question_link_text) {
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("text-center", "mt-4");
+
                 const linkElement = document.createElement("a");
                 linkElement.href = question_link;
                 linkElement.target = "_blank";
-                linkElement.textContent = question_link_text;
-                linkElement.classList.add("text-cyan-400", "hover:text-cyan-500", "block", "mt-4", "text-center");
-                content.appendChild(linkElement);
+                linkElement.classList.add("text-cyan-400", "hover:text-cyan-500", "inline-flex", "items-center", "gap-1");
+
+                const linkText = document.createElement("span");
+                linkText.textContent = "Investigate HERE 🔗";
+                linkElement.appendChild(linkText);
+
+                const hintText = document.createElement("div");
+                hintText.textContent = question_link_text;
+                hintText.classList.add("hidden", "mt-2", "text-sm", "text-gray-300", "transition-all", "duration-200");
+
+                const toggleButton = document.createElement("button");
+                toggleButton.textContent = "🤔 Show Hint";
+                toggleButton.classList.add("block", "mx-auto", "mt-2", "text-sm", "text-gray-300", "hover:underline");
+                toggleButton.addEventListener("click", () => {
+                    hintText.classList.toggle("hidden");
+                    toggleButton.textContent = hintText.classList.contains("hidden") ? "🤔 Show Hint" : "Hide Hint";
+                });
+
+                wrapper.appendChild(linkElement);
+                wrapper.appendChild(toggleButton);
+                wrapper.appendChild(hintText);
+                content.appendChild(wrapper);
 
                 const hrElement = document.createElement("hr");
                 hrElement.classList.add("border-gray-600", "my-4");
