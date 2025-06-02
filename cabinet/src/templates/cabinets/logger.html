@@ -269,7 +269,7 @@
 
                             // Inform other code modules in this application that the game is over
                             Frogger.observer.publish("game-over");
-                            
+
                             redirectToQuestions("logger", 1);
                         }
 
@@ -300,7 +300,8 @@
                                 version: "v1.0",
                                 message: "you killed a frog!",
                                 level: _timesAtGoal,
-                                shrinkage: curLongLogWidth
+                                shrinkage: curLongLogWidth,
+                                user_agent: navigator.userAgent,
                             };
 
                             $.ajax({
