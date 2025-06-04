@@ -197,6 +197,7 @@
             projectiles: bullets.length,
             duration: gameDuration,
             version: version,
+            user_agent: navigator.userAgent,
           };
 
           $.ajax({
@@ -570,7 +571,6 @@
               if (lives > 0) {
                 isDeathAnimating = true;
                 deathAnimationFrame = 0;
-                gamePaused = true;
               }
 
               drawScore({
@@ -882,7 +882,6 @@
             if (deathAnimationFrame >= DEATH_ANIMATION_DURATION) {
               isDeathAnimating = false;
               deathAnimationFrame = 0;
-              gamePaused = true;
             }
 
             // Pause other game actions during animation
