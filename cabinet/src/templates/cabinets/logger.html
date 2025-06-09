@@ -82,10 +82,13 @@
                 let curMediumLogWidth = defaultMediumLogWidth;
                 let curLongLogWidth = defaultLongLogWidth;
 
+                
                 function runLogger() {
                     let pauseLoop = false;
                     let endLoop = false;
-
+                    let gameStartTime = Date.now();
+                    let gameDuration = 0; 
+                    
                     // Define a namespace to contain the code for our game within a single global variable
                     var Frogger = (function () {
 
@@ -192,6 +195,13 @@
                         };
                     })();
 
+                    function calculateGameDuration() {
+                        const currentTime = Date.now();
+                        const durationInMilliseconds = currentTime - gameStartTime;
+
+                        return Math.floor(durationInMilliseconds / 1000);
+                    }
+
                     // Define the game logic module which keeps track of the game state, the players's score,
                     // the number of lives remaining, handles collisions between the player's character and
                     // other obstacles and ensures the game graphics are drawn onto the <canvas> at the
@@ -238,6 +248,9 @@
                             // the animation running smoothly at the defined refresh rate
                             _lastTimeGameLoopRan = (new Date()).getTime();
 
+                            // Define a movement count
+                            _movementCount = 0;
+
                         // Define a function to be called to count down the time remaining for the player to
                         // reach the goal without forfeiting a life
                         function countDown() {
@@ -267,6 +280,31 @@
                             // Pause the player's movements as they are no longer in the game
                             freezePlayer();
 
+                            gameDuration = calculateGameDuration();
+                            
+                            dict = {
+                                game_session_id: "{{ gamesession }}",
+                                title: "logger",
+                                player_name: "{{ user_username }}",
+                                player_id: "{{ user_uuid }}",
+                                version: "v1.0",
+                                current_score: _score,
+                                level: _timesAtGoal,
+                                duration: gameDuration,
+                                movement: _movementCount,
+                                shrinkage: curLongLogWidth
+                            };
+                            
+                            console.log("gameOver dict:", dict);
+                            
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ url_for("routes.record_game_score") }}',
+                                data: JSON.stringify(dict),
+                                contentType: "application/json",
+                            });
+
+
                             // Inform other code modules in this application that the game is over
                             Frogger.observer.publish("game-over");
 
@@ -275,6 +313,31 @@
 
                         // Define a function to be called when the player has reached the goal
                         function gameWon() {
+                            _timesAtGoal = 0
+
+                            gameDuration = calculateGameDuration();
+                            
+                            dict = {
+                                game_session_id: "{{ gamesession }}",
+                                title: "logger",
+                                player_name: "{{ user_username }}",
+                                player_id: "{{ user_uuid }}",
+                                version: "v1.0",
+                                current_score: _score,
+                                level: 5,
+                                duration: gameDuration,
+                                movement: _movementCount,
+                                shrinkage: curLongLogWidth
+                            };
+                            
+                            console.log("gameWon dict:", dict);
+
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ url_for("routes.record_game_score") }}',
+                                data: JSON.stringify(dict),
+                                contentType: "application/json",
+                            });
 
                             // Inform other code modules that the game has been won
                             Frogger.observer.publish("game-won");
@@ -285,6 +348,8 @@
 
                             // Decrease the number of lives the player has remaining
                             _lives--;
+
+                            gameDuration = calculateGameDuration();
 
                             // Pause the player's movements
                             freezePlayer();
@@ -297,13 +362,25 @@
                                 title: "logger",
                                 player_name: "{{ user_username }}",
                                 player_id: "{{ user_uuid }}",
+                                active: true,
+                                current_score: _score,
+                                level: _timesAtGoal,
+                                duration: gameDuration,
+                                movement: _movementCount,
                                 version: "v1.0",
                                 message: "you killed a frog!",
-                                level: _timesAtGoal,
                                 shrinkage: curLongLogWidth,
                                 user_agent: navigator.userAgent,
                             };
+                            console.log("loseLife dict:", dict);
 
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ url_for("routes.record_game_score") }}',
+                                data: JSON.stringify(dict),
+                                contentType: "application/json",
+                            });
+                            
                             $.ajax({
                                 type: "POST",
                                 url: '{{ url_for("routes.log") }}',
@@ -355,6 +432,8 @@
                             // Increase the score by the supplied amount (or by 0 if no value is provided)
                             _score += increaseBy || 0;
 
+                            gameDuration = calculateGameDuration();
+
                             // Inform other code modules that the player's score has changed, passing along
                             // the new score
                             Frogger.observer.publish("score-change", _score);
@@ -375,8 +454,13 @@
                                 player_id: "{{ user_uuid }}",
                                 active: true,
                                 current_score: _score,
+                                level: _timesAtGoal,
+                                duration: gameDuration,
+                                movement: _movementCount,
                                 version: "v1.0"
                             };
+                            
+                            console.log("increaseScore dict:", dict);
 
                             $.ajax({
                                 type: "POST",
@@ -393,7 +477,6 @@
                                     player_id: "{{ user_uuid }}",
                                     version: "v1.0",
                                     message: "hop hop hop",
-                                    level: _timesAtGoal,
                                     shrinkage: curLongLogWidth
                                 };
 
@@ -415,29 +498,41 @@
                             // has reached the goal
                             _timesAtGoal++;
 
+                            gameDuration = calculateGameDuration();
+
                             if (enableShrinkify) {
                                 curShortLogWidth -= 25;
                                 curMediumLogWidth -= 45;
                                 curLongLogWidth -= 65;
-
-                                dict = {
-                                    game_session_id: "{{ gamesession }}",
-                                    title: "logger",
-                                    player_name: "{{ user_username }}",
-                                    player_id: "{{ user_uuid }}",
-                                    version: "v1.0",
-                                    message: "shrinkify",
-                                    level: _timesAtGoal,
-                                    shrinkage: curLongLogWidth
-                                };
-
-                                $.ajax({
-                                    type: "POST",
-                                    url: '{{ url_for("routes.log") }}',
-                                    data: JSON.stringify(dict),
-                                    contentType: "application/json",
-                                });
                             }
+                            
+                            dict = {
+                                game_session_id: "{{ gamesession }}",
+                                title: "logger",
+                                player_name: "{{ user_username }}",
+                                player_id: "{{ user_uuid }}",
+                                version: "v1.0",
+                                message: "shrinkify",
+                                duration: gameDuration,
+                                level: _timesAtGoal,
+                                shrinkage: curLongLogWidth
+                            };
+                            
+                            console.log("playerAtGoal dict:", dict);
+
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ url_for("routes.log") }}',
+                                data: JSON.stringify(dict),
+                                contentType: "application/json",
+                            });
+
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ url_for("routes.record_game_score") }}',
+                                data: JSON.stringify(dict),
+                                contentType: "application/json",
+                            });
 
                             // Freeze the player's character movement temporarily to acknowledge they have
                             // reached the goal
@@ -1945,6 +2040,10 @@
                                 RIGHT_ARROW = 39,
                                 DOWN_ARROW = 40;
 
+                            if (event.keyCode === LEFT_ARROW || event.keyCode === RIGHT_ARROW || event.keyCode === UP_ARROW || event.keyCode === DOWN_ARROW) {
+                                _movementCount++;
+                            }
+
                             if (event.keyCode === LEFT_ARROW) {
                                 move(Frogger.direction.LEFT);
                             } else if (event.keyCode === RIGHT_ARROW) {
@@ -2191,6 +2290,7 @@
                                 // positioned above the goal, fire the "player-at-goal" event so the game logic
                                 // module registers that the goal has been reached
                                 if (Frogger.intersects(obstaclesItem.getPosition(), characterPosition)) {
+                                    console.log("Collision detected with goal:", index);
                                     if (!obstaclesItem.isMet) {
                                         this.obstacles[index].isMet = true;
                                         Frogger.observer.publish("player-at-goal");
