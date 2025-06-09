@@ -4,7 +4,7 @@
       {
         "source": "static",
         "question": "Who has the all time top score in v0.5?",
-        "link_text": "Click here to investigate in your Arcade dashboard in Splunk Observability Cloud",
+        "link_text": "Investigate HERE link to investigate in your Arcade dashboard in Splunk Observability Cloud",
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
           {
@@ -52,7 +52,7 @@
       {
         "source": "static",
         "question": "What is the name of the database connected to splunk-arcade-cabinet-player-__PLAYER_NAME__ service?",
-        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map (If you died quickly you may be faster than your data. Refresh the dashboard after a brief pause).",
+        "link_text": "Investigate HERE link to see your game cabinet, and dependencies, in an APM map (If you died quickly you may be faster than your data. Refresh the dashboard after a brief pause).",
         "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
         "choices": [
           {
@@ -93,7 +93,7 @@
             "is_correct": true
           },
           {
-            "prompt": "arcade.imvaders.score",
+            "prompt": "imvaders.arcade.projectiles",
             "is_correct": false
           }
         ]
@@ -101,7 +101,7 @@
       {
         "source": "static",
         "question": "The scoreboard service seems to be experiencing a lot of errors on one of the endpoints. Can you identify which endpoint it is?",
-        "link_text": "Click here to investigate using Tag Spotlight in Splunk APM",
+        "link_text": "Investigate HERE link to investigate using Tag Spotlight in Splunk APM",
         "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
         "choices": [
           {
@@ -152,7 +152,7 @@
       {
         "source": "static",
         "question": "What version of the IMVaders game is more error-prone than the other versions?",
-        "link_text": "Click here to investigate using indexed tags in Splunk APM",
+        "link_text": "Investigate HERE link to investigate using indexed tags in Splunk APM",
         "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
         "choices": [
           {
@@ -176,7 +176,7 @@
       {
         "source": "static",
         "question": "What services does your splunk-arcade-cabinet-player-__PLAYER_NAME__ talk to?",
-        "link_text": "Click here to see your game cabinet, and dependencies, in an APM map",
+        "link_text": "Investigate HERE link to see your game cabinet, and dependencies, in an APM map",
         "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
         "choices": [
           {
@@ -376,7 +376,7 @@
       {
         "source": "static",
         "question": "You'll have a dashboard with some data to investigate, including a player score metric. What do you think that metric will tell us about the game’s performance or player behavior?",
-        "link_text": "Click here to investigate service dependencies in Splunk APM!",
+        "link_text": "Investigate HERE link to investigate service dependencies in Splunk APM!",
         "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilte[…]%22%5D%7D%5D%7D,%22spanFilters%22:%5B%5D%7D&startTime=-15m",
         "choices": [
           {
@@ -404,7 +404,7 @@
       {
         "source": "static",
         "question": "1. What is the `process.executable.name` associated with metrics coming from Logger ?",
-        "link_text": "Click here to investigate in your Arcade dashboard in Splunk Observability Cloud",
+        "link_text": "Click Investigate HERE link to investigate in your Arcade dashboard in Splunk Observability Cloud",
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__ click into a data chart for more information on individual metrics",
         "choices": [
           {
@@ -450,7 +450,7 @@
       {
         "source": "static",
         "question": "The logs are trying to WARN you about something. What is it?",
-        "link_text": "Click here to investigate in Splunk Log Observer",
+        "link_text": "Investigate HERE link to investigate in Splunk Log Observer",
         "link": "https://app.__REALM__.signalfx.com/#/logs?SI=%7B%22selectedIndexes%22:%5B%7B%22__typename%22:%22SplunkEnterpriseIndex%22,%22indexID%22:%22GHVu2ULA4AE:splunk-arcade%22,%22name%22:%22splunk-arcade%22%7D%5D%7D&astate=%7B%22isStreaming%22:false,%22showLiveTail%22:false,%22liveTailOn%22:false%7D&iq=%7B%22selectedIntegrationId%22:%22GHVu2ULA4AE%22%7D&qd=%7B%22timeRange%22:%7B%22earliest%22:%22-15m%22,%22latest%22:%22now%22%7D,%22filters%22:%5B%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22logger%22%5D,%22field%22:%7B%22name%22:%22title%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D,%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22kube:container:player%22%5D,%22field%22:%7B%22name%22:%22sourcetype%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D%5D,%22aggregations%22:%5B%7B%22field%22:%22All%20(*)%22,%22aggregationFn%22:%22COUNT%22%7D%5D,%22groupings%22:%5B%7B%22field%22:%22severity%22%7D%5D,%22resolution%22:10,%22limit%22:10000,%22summaryLimit%22:150000,%22searchTimeRules%22:%5B%5D,%22useTopRecords%22:150000%7D",
         "choices": [
           {
@@ -474,7 +474,7 @@
       {
         "source": "static",
         "question": "What's the score from this trace?",
-        "link_text": "Click here to see the trace",
+        "link_text": "Investigate HERE link to see the trace",
         "link": "https://app.__REALM__.signalfx.com/#/apm/traces/3517415934adc33fc4bf553d4d7bb1ec",
         "choices": [
           {
@@ -498,7 +498,7 @@
       {
         "source": "static",
         "question": "What is the longest jinja span?",
-        "link_text": "Click here to see the trace",
+        "link_text": "Investigate HERE link to see the trace",
         "link": "https://app.__REALM__.signalfx.com/#/apm/traces/da24bd449d4150153fd6a2c2c218ad15",
         "choices": [
           {
@@ -522,7 +522,7 @@
       {
         "source": "static",
         "question": "What are the number of pods running at this time?",
-        "link_text": "Click here to view kubernetes navigator",
+        "link_text": "Investigate HERE link to view kubernetes navigator",
         "link": "https://app.__REALM__.signalfx.com/#/infra/entity/k8sdeployments?dashboardId=GbkHF6BA4WY&endTimeUTC=1740008760000&mapSelection=splunk-arcade-player-router%20%7C%20splunk-arcade%20%7C%20gamify&metricClass=default&startTimeUTC=1739994360000",
         "choices": [
           {
