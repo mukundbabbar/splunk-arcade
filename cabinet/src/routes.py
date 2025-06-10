@@ -273,6 +273,11 @@ def get_logger_version():
     return {"version": ret.json()["game_versions"].get("logger") or 1.0}
 
 
+@routes.route("/get_logger_add/<int:life>", methods=["GET"])
+def get_logger_add(life: int):
+    print("GET ADD FOR LIFE NUMBER ", life)
+
+
 @routes.route("/are_you_not_entertained", methods=["GET", "POST"])
 def are_you_not_entertained():
     return render_template("doom.html")

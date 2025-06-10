@@ -75,6 +75,7 @@
                 const shortLogWidth = 190;
                 const mediumLogWidth = 254;
                 const longLogWidth = 392;
+                const turtleRows = [560, 320]
 
                 let version = "1.0";
 
@@ -101,6 +102,8 @@
                     let endLoop = false;
                     let gameStartTime = Date.now();
                     let gameDuration = 0;
+                    let seenRows = [];
+                    let curLives = 5;
 
                     // Define a namespace to contain the code for our game within a single global variable
                     var Frogger = (function () {
@@ -215,6 +218,7 @@
                         return Math.floor(durationInMilliseconds / 1000);
                     }
 
+                    window.Frogger = window.Frogger || {};
                     // Define the game logic module which keeps track of the game state, the players's score,
                     // the number of lives remaining, handles collisions between the player's character and
                     // other obstacles and ensures the game graphics are drawn onto the <canvas> at the
@@ -361,6 +365,11 @@
 
                             // Decrease the number of lives the player has remaining
                             _lives--;
+
+                            // cuz i dunno how to access frogger obj from other places and am lazy
+                            curLives--;
+                            // reset the seen rows so we show "adds"
+                            seenRows = [];
 
                             gameDuration = calculateGameDuration();
 
@@ -2158,6 +2167,14 @@
                             // Define a method to detect whether the player's character is currently colliding
                             // with an obstacle on this row
                             isCollision: function (characterPosition) {
+                              if (!seenRows.includes(this.top) && turtleRows.includes(this.top)) {
+                                seenRows.push(this.top);
+                                // TODO we need to do adds here!
+                                if (curLives != 3) {
+                                  console.log("NOT 3, SHOW ADD")
+                                }
+
+                              }
                                 var index = 0,
                                     length = this.obstacles.length,
                                     obstaclesItem,
