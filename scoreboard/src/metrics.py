@@ -57,6 +57,7 @@ class ImvadersMetrics(Metrics):
             "title": self.name,
             "version": game_data.get("version", "unknown"),
             "player_name": game_data.get("player_name", "unknown"),
+            "user_agent": game_data.get("user_agent", "unknown"),
         }
 
         values = {
@@ -87,19 +88,41 @@ class LoggerMetrics(Metrics):
 
         super().__init__(name="logger")
 
+        self.movement_gauge = self.meter.create_gauge(
+            name=f"arcade.{self.name}.movement",
+            description=f"movements for the game `{self.name}`",
+        )
+
+        self.level_gauge = self.meter.create_gauge(
+            name=f"arcade.{self.name}.level",
+            description=f"level counter for the game `{self.name}`",
+        )
+
+        self.duration_gauge = self.meter.create_gauge(
+            name=f"arcade.{self.name}.duration",
+            description=f"duration of play time for the game `{self.name}`",
+        )
+
         self.initialized = True
 
     def process(self, game_data: dict[str, Any]) -> None:
         values = {
             "score": game_data.get("current_score", 0),
+            "movement": game_data.get("movement", 0),
+            "duration": game_data.get("duration", 0),
+            "level": game_data.get("level", 0),
         }
         attributes = {
             "title": self.name,
             "version": game_data.get("version", "unknown"),
             "player_name": game_data.get("player_name", "unknown"),
+            "user_agent": game_data.get("user_agent", "unknown"),
         }
 
         self.score_gauge.set(amount=values["score"], attributes=attributes)
+        self.movement_gauge.set(amount=values["movement"], attributes=attributes)
+        self.level_gauge.set(amount=values["level"], attributes=attributes)
+        self.duration_gauge.set(amount=values["duration"], attributes=attributes)
 
 
 class BughuntMetrics(Metrics):

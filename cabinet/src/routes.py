@@ -20,6 +20,8 @@ ARCADE_HOST = os.getenv("ARCADE_HOST")
 SCOREBOARD_HOST = os.getenv("SCOREBOARD_HOST")
 PLAYER_CONTENT_HOST = os.getenv("PLAYER_CONTENT_HOST")
 SPLUNK_OBSERVABILITY_REALM = os.getenv("SPLUNK_OBSERVABILITY_REALM", "us1")
+ARCADE_O11Y_DASHBOARD = {"us1":"Grko8cDA0Ao?groupId=GjETzI8AwAE&startTime=-1h&endTime=Now", "eu0":"placeHolDeERid?groupId=PlAcEHoLDeRid"}
+
 
 IMVADERS_SLOW_VERSION = "0.75"
 UNPROCESSABLE_ENTITY = 422
@@ -29,9 +31,13 @@ def _realmify_dashboard_url(url: str) -> str:
     return url.replace("app.signalfx.com", f"app.{SPLUNK_OBSERVABILITY_REALM}.signalfx.com")
 
 
-FINAL_DASHBOARD_URL = _realmify_dashboard_url(
+FINAL_DASHBOARD_BASE_URL = _realmify_dashboard_url(
     os.getenv("dashboard_url", "https://app.signalfx.com/#/dashboard/"),
 )
+
+dashboard_path_for_realm = ARCADE_O11Y_DASHBOARD.get(SPLUNK_OBSERVABILITY_REALM, "us1")
+
+FINAL_DASHBOARD_URL = f"{FINAL_DASHBOARD_BASE_URL}{dashboard_path_for_realm}"
 
 
 logging.basicConfig(level=logging.INFO)
