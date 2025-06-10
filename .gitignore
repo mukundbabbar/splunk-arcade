@@ -1,6 +1,8 @@
 # jetbrains goodies
 .idea
 
+.zed
+
 # macos stuff
 .DS_Store
 */.DS_Store

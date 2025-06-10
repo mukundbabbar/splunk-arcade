@@ -262,7 +262,7 @@ def get_imvaders_version():
 
 
 @routes.route("/get_logger_shrink_state", methods=["GET"])
-def get_logger_shrink_state():
+def get_logger_version():
     ret = requests.get(
         f"http://{SCOREBOARD_HOST}/player_progression",
         headers={
@@ -270,72 +270,12 @@ def get_logger_shrink_state():
         },
     )
 
-    return {"version": ret.json()["game_versions"].get("logger") or 1.29}
+    return {"version": ret.json()["game_versions"].get("logger") or 1.0}
 
 
 @routes.route("/are_you_not_entertained", methods=["GET", "POST"])
 def are_you_not_entertained():
     return render_template("doom.html")
-
-
-def _logger_log(content: str):
-    log_messages = [LOGGER.info, content]
-
-    if "shrinkify" in content:
-        log_messages = [
-            (LOGGER.warning, "Quantum Log Shrinkage Uncertainty: It exists… but also doesn't."),
-            (LOGGER.warning, "Log Shrinkage Detected: Hope you've been practicing your jumps!"),
-            (LOGGER.warning, "Structural Integrity Failing: This log shrinking to 50% nostalgia."),
-            (LOGGER.warning, "Log Density Shrinkage: Someone forgot to pay the tree rent."),
-            (LOGGER.warning, "Log Vaporization Imminent: No logs left to shrink."),
-        ]
-    elif "you killed a frog" in content:
-        log_messages = [
-            (
-                LOGGER.critical,
-                "Amphibian Anomaly: You exist in a quantum state of both 'ribbit' and 'rib-GONE'.",
-            ),
-            (
-                LOGGER.critical,
-                "Toad Traffic Violation: Failure to yield to a semi-truck. Penalty: one life.",
-            ),
-            (LOGGER.error, "Frog Detour Failed: Turns out the river was just hungry today."),
-            (LOGGER.error, "Respawn Tax Implemented: The afterlife is getting expensive."),
-            (LOGGER.critical, "Frogger Fatality: Your insurance doesn't cover reckless hopping."),
-            (LOGGER.critical, "Hopper Down: The universe just subtracted you."),
-        ]
-    elif "hop hop hop" in content:
-        log_messages = [
-            (
-                LOGGER.info,
-                "Frog Fact: A single leap can change your whole trajectory—both in"
-                " life and on the highway.",
-            ),
-            (LOGGER.info, "Pond Update: Water is still wet. Log availability fluctuating."),
-            (
-                LOGGER.info,
-                "Bug Buffet Alert: All-you-can-eat fly special available on lily pad #3.",
-            ),
-            (
-                LOGGER.info,
-                "Traffic Advisory: Vehicles show no sign of slowing. Hopping recommended.",
-            ),
-            (
-                LOGGER.info,
-                "Amphibian Analytics: Hopping efficiency up 12%, but reckless road crossings"
-                " remain a concern.",
-            ),
-            (LOGGER.info, "River Status: Logs are floating, turtles are plotting."),
-            (
-                LOGGER.info,
-                "Frog Philosophy: Sometimes the safest path is also the most boring. Hop wisely.",
-            ),
-            (LOGGER.info, "Footwear Forecast: Zero frog-friendly crosswalks detected."),
-            (LOGGER.info, "Bug Economics: Supply remains steady, demand remains infinite."),
-            (LOGGER.info, "Frogger Metrics: Total leaps today: 37. Successful crossings: TBD."),
-        ]
-
-    return random.choice(log_messages)
 
 
 @routes.route("/log", methods=["POST"])
@@ -350,9 +290,6 @@ def log():
 
     title = content.get("title", "unknown title")
     message = content.get("message", "unknown message")
-
-    if title == "logger":
-        logf, message = _logger_log(message)
 
     logf(f'title: "{title}" | message: "{message}"')
 
