@@ -261,7 +261,7 @@ def get_imvaders_version():
     return {"version": ret.json()["game_versions"].get("imvaders") or 0.75}
 
 
-@routes.route("/get_logger_shrink_state", methods=["GET"])
+@routes.route("/get_logger_version", methods=["GET"])
 def get_logger_version():
     ret = requests.get(
         f"http://{SCOREBOARD_HOST}/player_progression",

@@ -76,6 +76,25 @@
                 const mediumLogWidth = 254;
                 const longLogWidth = 392;
 
+                let version = "1.0";
+
+                async function getVersion() {
+                  try {
+                    const response = await fetch('{{ url_for("routes.get_logger_version") }}');
+                    const data = await response.json();
+                    version = data.version;
+                    console.log("current version:", version);
+                    return version;
+                  } catch (error) {
+                    console.log("error determining logger version:", error);
+                    return version;
+                  }
+                }
+
+                async function main() {
+                  await getVersion();
+                  runLogger();
+                }
 
                 function runLogger() {
                     let pauseLoop = false;
@@ -479,7 +498,6 @@
                                     contentType: "application/json",
                                 });
                             }
-                            console.log("increaseScore dict:", dict);
                         }
 
                         // Define a function to execute once the player reaches the designated goal
@@ -1892,7 +1910,15 @@
 
                                 // Publish an event to the rest of the code modules, indicating that the
                                 // player's position has been moved by the player
-                                Frogger.observer.publish("player-moved");
+                                if (version === "1.0") {
+                                  // player moved is probably a bad name, the only thing subscribing
+                                  // to this is the score increaser
+                                  Frogger.observer.publish("player-moved");
+                                } else {
+                                  if (characterDirection === "up") {
+                                    Frogger.observer.publish("player-moved");
+                                  }
+                                }
                             }
                         }
 
@@ -2475,8 +2501,7 @@
                     Frogger.observer.publish("game-load");
                 }
 
-                runLogger();
-
+                main()
             </script>
         </div>
     </body>
