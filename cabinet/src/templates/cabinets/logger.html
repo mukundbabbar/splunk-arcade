@@ -2030,7 +2030,16 @@
                             }
 
                             if (event.keyCode === LEFT_ARROW) {
+                              if (version === "1.5") {
+                                _movementCount += 10;
+
+                                if (_movementCount % 2 == 0) {
+                                    move(Frogger.direction.LEFT);
+                                }
+                              } else {
                                 move(Frogger.direction.LEFT);
+                              }
+
                             } else if (event.keyCode === RIGHT_ARROW) {
                                 move(Frogger.direction.RIGHT);
                             } else if (event.keyCode === UP_ARROW) {
