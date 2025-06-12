@@ -92,6 +92,24 @@
                   }
                 }
 
+                async function getLoggerAd(life) {
+                  const loggerAdBaseUrl = "{{ url_for('routes.get_logger_ad', version='v1.0', life=0).rsplit('/', 2)[0] }}";
+                  try {
+                    const url = `${loggerAdBaseUrl}/${version}/${life}`;
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.message) {
+                      showToast(data.message);
+                    }
+                  } catch (error) {
+                    console.log(error)
+                  }
+                }
+
                 async function main() {
                   await getVersion();
                   runLogger();
@@ -325,7 +343,13 @@
                             // Inform other code modules in this application that the game is over
                             Frogger.observer.publish("game-over");
 
-                            redirectToQuestions("logger", 1);
+                            let question_count = 1;
+
+                            if (["1.0", "1.5"].includes(version)) {
+                              question_count = 3;
+                            }
+
+                            redirectToQuestions("logger", question_count);
                         }
 
                         // Define a function to be called when the player has reached the goal
@@ -2169,11 +2193,7 @@
                             isCollision: function (characterPosition) {
                               if (!seenRows.includes(this.top) && turtleRows.includes(this.top)) {
                                 seenRows.push(this.top);
-                                // TODO we need to do adds here!
-                                if (curLives != 3) {
-                                  console.log("NOT 3, SHOW ADD")
-                                }
-
+                                  getLoggerAd(curLives);
                               }
                                 var index = 0,
                                     length = this.obstacles.length,

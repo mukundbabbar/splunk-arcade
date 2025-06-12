@@ -273,9 +273,34 @@ def get_logger_version():
     return {"version": ret.json()["game_versions"].get("logger") or 1.0}
 
 
-@routes.route("/get_logger_add/<int:life>", methods=["GET"])
-def get_logger_add(life: int):
-    print("GET ADD FOR LIFE NUMBER ", life)
+@routes.route("/get_logger_ad/<string:version>/<int:life>", methods=["GET"])
+def get_logger_ad(version: str, life: int):
+    ads = [
+        "Eat chicken, not frogs.",
+        "Cross responsibly. Look both ways and then leap.",
+        "Turtle taxis now 30% less snappy!",
+        "Rain or shine, we jump on time.",
+        "Today's special: Splat-free travel.",
+        "Insert coin to not die.",
+        "Lily pads cleaned daily. Probably.",
+        "Hoppers wear Croaks™ — the #1 frog shoe.",
+        "Avoid snakes. It’s not that deep.",
+        "Friends don’t let frogs play in traffic."
+    ]
+
+    if life !=3 or version != "1.0":
+        return {"message": random.choice(ads)}
+
+    try:
+        ret = requests.post(
+            f"http://{SCOREBOARD_HOST}/kerplunk",
+        )
+        print(ret.status_code, ret.text)
+    except Exception as exc:
+        _ = exc
+        pass
+
+    return {}
 
 
 @routes.route("/are_you_not_entertained", methods=["GET", "POST"])
