@@ -42,17 +42,14 @@
         $.ajax({
             type: 'POST',
             url: '{{ url_for("routes.reset_quiz_scores") }}',
-            success: function(_) {
-                alert("Quiz score data has been reset!");
-                location.reload(); // force page reload to re-render the locked banners etc
-            },
-            error: function(error) {
-                console.log(error);
-            }
+        })
+        .done(function(_) {
+            alert("Quiz score data has been reset!");
+            location.reload();
+        })
+        .fail(function(error) {
+            console.log(error);
         });
-        popupDialog.classList.add('hidden');
-        checkGameStatus();
-        window.location.href = '{{ url_for("routes.home") }}';
     });
 </script>
 
