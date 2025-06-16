@@ -17,9 +17,9 @@ GAME_VERSIONS = {
         (6, "1.0"),
     ],
     "logger": [
-        (0, "0.5"),
-        (3, "0.75"),
-        (6, "1.0"),
+        (0, "1.0"),
+        (3, "1.5"),
+        (6, "1.6"),
     ],
 }
 
@@ -235,6 +235,45 @@ def blackhole_sun():
         (404, "Not Found: The sun has vanished into the void."),
         (500, "Internal Server Error: Singularity collapse imminent."),
         (503, "Service Unavailable: Black hole undergoing maintenance."),
+    ]
+    code, message = random.choice(errors)
+
+    return jsonify(abort(code, description=message))
+
+
+@routes.route("/kerplunk", methods=["POST"])
+def kerplunk():
+    content = request.get_json()
+
+    current_span = trace.get_current_span()
+    for k, v in content.items():
+        current_span.set_attribute(k, v)
+
+    scoreboard_update = {}
+
+    for k, v in content.items():
+        if isinstance(v, bool) or isinstance(v, list):
+            x = str(v)
+        else:
+            x = v
+        scoreboard_update[k] = x
+
+    try:
+        metric_factory(name=scoreboard_update["title"]).process(game_data=scoreboard_update)
+    except Exception as e:
+        print(f"ignoring metrics exception: {e}")
+
+    errors = [
+        (400, "Bad Request: Frog tried to cross before the light turned green."),
+        (401, "Unauthorized: Toad with no tokens detected."),
+        (403, "Forbidden: Hopper not cleared for this lane."),
+        (404, "Not Found: Frog missed the lily pad."),
+        (418, "I'm a Teapot: And also a flattened amphibian."),
+        (429, "Too Many Requests: The crosswalk is jammed with turtles."),
+        (500, "Internal Server Error: Frogger hit by a memory bus."),
+        (502, "Bad Gateway: Log drift caused route misalignment."),
+        (503, "Service Unavailable: Arcade machine took a coffee break."),
+        (504, "Gateway Timeout: Frog paused mid-hop. Unwise."),
     ]
     code, message = random.choice(errors)
 
