@@ -72,23 +72,57 @@
             <canvas id="foreground-canvas" class="canvas" width="960" height="1280"></canvas>
             </div>
             <script>
-                var enableShrinkify = true;
+                const shortLogWidth = 190;
+                const mediumLogWidth = 254;
+                const longLogWidth = 392;
+                const turtleRows = [560, 320]
 
-                const defaultShortLogWidth = 190;
-                const defaultMediumLogWidth = 254;
-                const defaultLongLogWidth = 392;
+                let version = "1.0";
 
-                let curShortLogWidth = defaultShortLogWidth;
-                let curMediumLogWidth = defaultMediumLogWidth;
-                let curLongLogWidth = defaultLongLogWidth;
+                async function getVersion() {
+                  try {
+                    const response = await fetch('{{ url_for("routes.get_logger_version") }}');
+                    const data = await response.json();
+                    version = data.version;
+                    console.log("current version:", version);
+                    return version;
+                  } catch (error) {
+                    console.log("error determining logger version:", error);
+                    return version;
+                  }
+                }
 
-                
+                async function getLoggerAd(life) {
+                  const loggerAdBaseUrl = "{{ url_for('routes.get_logger_ad', version='v1.0', life=0).rsplit('/', 2)[0] }}";
+                  try {
+                    const url = `${loggerAdBaseUrl}/${version}/${life}`;
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.message) {
+                      showToast(data.message);
+                    }
+                  } catch (error) {
+                    console.log(error)
+                  }
+                }
+
+                async function main() {
+                  await getVersion();
+                  runLogger();
+                }
+
                 function runLogger() {
                     let pauseLoop = false;
                     let endLoop = false;
                     let gameStartTime = Date.now();
-                    let gameDuration = 0; 
-                    
+                    let gameDuration = 0;
+                    let seenRows = [];
+                    let curLives = 5;
+
                     // Define a namespace to contain the code for our game within a single global variable
                     var Frogger = (function () {
 
@@ -202,6 +236,7 @@
                         return Math.floor(durationInMilliseconds / 1000);
                     }
 
+                    window.Frogger = window.Frogger || {};
                     // Define the game logic module which keeps track of the game state, the players's score,
                     // the number of lives remaining, handles collisions between the player's character and
                     // other obstacles and ensures the game graphics are drawn onto the <canvas> at the
@@ -281,7 +316,7 @@
                             freezePlayer();
 
                             gameDuration = calculateGameDuration();
-                            
+
                             dict = {
                                 game_session_id: "{{ gamesession }}",
                                 title: "logger",
@@ -293,11 +328,10 @@
                                 level: _timesAtGoal,
                                 duration: gameDuration,
                                 movement: _movementCount,
-                                shrinkage: curLongLogWidth
                             };
-                            
+
                             console.log("gameOver dict:", dict);
-                            
+
                             $.ajax({
                                 type: "POST",
                                 url: '{{ url_for("routes.record_game_score") }}',
@@ -309,7 +343,13 @@
                             // Inform other code modules in this application that the game is over
                             Frogger.observer.publish("game-over");
 
-                            redirectToQuestions("logger", 1);
+                            let question_count = 1;
+
+                            if (["1.0", "1.5"].includes(version)) {
+                              question_count = 3;
+                            }
+
+                            redirectToQuestions("logger", question_count);
                         }
 
                         // Define a function to be called when the player has reached the goal
@@ -317,7 +357,7 @@
                             _timesAtGoal = 0
 
                             gameDuration = calculateGameDuration();
-                            
+
                             dict = {
                                 game_session_id: "{{ gamesession }}",
                                 title: "logger",
@@ -329,9 +369,8 @@
                                 level: 5,
                                 duration: gameDuration,
                                 movement: _movementCount,
-                                shrinkage: curLongLogWidth
                             };
-                            
+
                             console.log("gameWon dict:", dict);
 
                             $.ajax({
@@ -350,6 +389,11 @@
 
                             // Decrease the number of lives the player has remaining
                             _lives--;
+
+                            // cuz i dunno how to access frogger obj from other places and am lazy
+                            curLives--;
+                            // reset the seen rows so we show "adds"
+                            seenRows = [];
 
                             gameDuration = calculateGameDuration();
 
@@ -372,7 +416,6 @@
                                 movement: _movementCount,
                                 version: "v1.0",
                                 message: "you killed a frog!",
-                                shrinkage: curLongLogWidth,
                             };
                             console.log("loseLife dict:", dict);
 
@@ -382,7 +425,7 @@
                                 data: JSON.stringify(dict),
                                 contentType: "application/json",
                             });
-                            
+
                             $.ajax({
                                 type: "POST",
                                 url: '{{ url_for("routes.log") }}',
@@ -457,7 +500,6 @@
                                     user_agent: navigator.userAgent,
                                     version: "v1.0",
                                     message: "hop hop hop",
-                                    shrinkage: curLongLogWidth
                             };
 
                             $.ajax({
@@ -466,7 +508,7 @@
                                 data: JSON.stringify(dict),
                                 contentType: "application/json",
                             });
-                            
+
                             if (_score % 50 === 0) {
                                 dict = {
                                     game_session_id: "{{ gamesession }}",
@@ -481,7 +523,7 @@
                                     movement: _movementCount,
                                     version: "v1.0"
                                 };
-                                
+
                                 $.ajax({
                                     type: "POST",
                                     url: '{{ url_for("routes.record_game_score") }}',
@@ -489,7 +531,6 @@
                                     contentType: "application/json",
                                 });
                             }
-                            console.log("increaseScore dict:", dict);
                         }
 
                         // Define a function to execute once the player reaches the designated goal
@@ -503,12 +544,6 @@
 
                             gameDuration = calculateGameDuration();
 
-                            if (enableShrinkify) {
-                                curShortLogWidth -= 25;
-                                curMediumLogWidth -= 45;
-                                curLongLogWidth -= 65;
-                            }
-                            
                             dict = {
                                 game_session_id: "{{ gamesession }}",
                                 title: "logger",
@@ -516,12 +551,11 @@
                                 player_id: "{{ user_uuid }}",
                                 user_agent: navigator.userAgent,
                                 version: "v1.0",
-                                message: "shrinkify",
+                                message: "frog across!",
                                 duration: gameDuration,
                                 level: _timesAtGoal,
-                                shrinkage: curLongLogWidth
                             };
-                            
+
                             console.log("playerAtGoal dict:", dict);
 
                             $.ajax({
@@ -638,23 +672,6 @@
                         // each frame of the game graphics and checks for collisions between the player's
                         // character and any obstacles on the game board
                         function start() {
-                            // TODO AJAX HERE TO GET SHRINK OR NOT
-                            $.ajax({
-                                type: "GET",
-                                url: '{{ url_for("routes.get_logger_shrink_state") }}',
-                                success: function (response) {
-                                    if (response.shrink) {
-                                        enableShrinkify = true;
-                                    } else {
-                                        enableShrinkify = false;
-                                    }
-                                },
-                                error: function (error) {
-                                    console.log("Error determining logger version:", error);
-                                },
-                            });
-
-
                             // Inform other code modules of the initial state of the game's high score
                             Frogger.observer.publish("high-score-change", _highScore);
 
@@ -1167,11 +1184,6 @@
                         // Define a function to render the text "GAME OVER" to the <canvas>. This will only be
                         // called when the game is over
                         function renderGameOver() {
-                            // reset log sizes
-                            curShortLogWidth = defaultShortLogWidth;
-                            curMediumLogWidth = defaultMediumLogWidth;
-                            curLongLogWidth = defaultLongLogWidth;
-
                             // Use the Arcade Classic font as previously defined, and write the text centered
                             // around the given drawing position in white
                             Frogger.foregroundDrawingSurface.font = _font;
@@ -1182,12 +1194,6 @@
                         // Define a function to render the text "YOU WIN!" to the <canvas> which will be called
                         // when the player has won the game by reaching the home base position five times
                         function renderGameWon() {
-                            // ensure logs default size
-                            curShortLogWidth = defaultShortLogWidth;
-                            curMediumLogWidth = defaultMediumLogWidth;
-                            curLongLogWidth = defaultLongLogWidth;
-
-
                             // Use the Arcade Classic font as previously defined, and write the text centered
                             // around the given drawing position in yellow (hex value #FF0)
                             Frogger.foregroundDrawingSurface.font = _font;
@@ -1547,7 +1553,7 @@
                         ShortLog.prototype.constructor = ShortLog;
                         ShortLog.prototype.spriteLeft = 0;
                         ShortLog.prototype.spriteTop = 160;
-                        ShortLog.prototype.width = curShortLogWidth;
+                        ShortLog.prototype.width = shortLogWidth;
 
                         // Define a medium log obstacle
                         function MediumLog(left) {
@@ -1560,7 +1566,7 @@
                         MediumLog.prototype.constructor = MediumLog;
                         MediumLog.prototype.spriteLeft = 0;
                         MediumLog.prototype.spriteTop = 240;
-                        MediumLog.prototype.width = curMediumLogWidth;
+                        MediumLog.prototype.width = mediumLogWidth;
 
                         // Define a long log obstacle
                         function LongLog(left) {
@@ -1573,7 +1579,7 @@
                         LongLog.prototype.constructor = LongLog;
                         LongLog.prototype.spriteLeft = 240;
                         LongLog.prototype.spriteTop = 160;
-                        LongLog.prototype.width = curLongLogWidth;
+                        LongLog.prototype.width = longLogWidth;
 
                         // Define a turtle obstacle. There are two types of turtle obstacle on the game board,
                         // one representing a group of two turtles and one representing a group of three
@@ -1937,7 +1943,15 @@
 
                                 // Publish an event to the rest of the code modules, indicating that the
                                 // player's position has been moved by the player
-                                Frogger.observer.publish("player-moved");
+                                if (version === "1.0") {
+                                  // player moved is probably a bad name, the only thing subscribing
+                                  // to this is the score increaser
+                                  Frogger.observer.publish("player-moved");
+                                } else {
+                                  if (characterDirection === "up") {
+                                    Frogger.observer.publish("player-moved");
+                                  }
+                                }
                             }
                         }
 
@@ -2049,7 +2063,16 @@
                             }
 
                             if (event.keyCode === LEFT_ARROW) {
+                              if (version === "1.5") {
+                                _movementCount += 10;
+
+                                if (_movementCount % 2 == 0) {
+                                    move(Frogger.direction.LEFT);
+                                }
+                              } else {
                                 move(Frogger.direction.LEFT);
+                              }
+
                             } else if (event.keyCode === RIGHT_ARROW) {
                                 move(Frogger.direction.RIGHT);
                             } else if (event.keyCode === UP_ARROW) {
@@ -2135,11 +2158,11 @@
                                     obstaclesItem = this.obstacles[index];
 
                                     if (obstaclesItem.constructor.name === "ShortLog") {
-                                        obstaclesItem.width = curShortLogWidth;
+                                        obstaclesItem.width = shortLogWidth;
                                     } else if (obstaclesItem.constructor.name === "MediumLog") {
-                                        obstaclesItem.width = curMediumLogWidth;
+                                        obstaclesItem.width = mediumLogWidth;
                                     } else if (obstaclesItem.constructor.name === "LongLog") {
-                                        obstaclesItem.width = curLongLogWidth;
+                                        obstaclesItem.width = longLogWidth;
                                     }
 
                                     // Update the left position, in pixels, of this obstacle based on its
@@ -2168,6 +2191,10 @@
                             // Define a method to detect whether the player's character is currently colliding
                             // with an obstacle on this row
                             isCollision: function (characterPosition) {
+                              if (!seenRows.includes(this.top) && turtleRows.includes(this.top)) {
+                                seenRows.push(this.top);
+                                  getLoggerAd(curLives);
+                              }
                                 var index = 0,
                                     length = this.obstacles.length,
                                     obstaclesItem,
@@ -2520,8 +2547,7 @@
                     Frogger.observer.publish("game-load");
                 }
 
-                runLogger();
-
+                main()
             </script>
         </div>
     </body>

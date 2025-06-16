@@ -135,6 +135,26 @@
                 leftDrawer.classList.toggle('-translate-x-full');
             }
         </script>
+
+        <script>
+            function showToast(message) {
+              const container = document.getElementById("toast-container");
+
+              const toast = document.createElement("div");
+              toast.className =
+                "bg-green-500 text-white absolute top-[-5px] left-1/2 transform -translate-x-1/2 px-6 py-4 text-center rounded-lg shadow-lg z-[9999] max-w-md w-full"
+              toast.textContent = message;
+
+              const main = document.getElementById("game-container");
+              main.appendChild(toast);
+
+              setTimeout(() => {
+                toast.classList.add("opacity-0");
+                setTimeout(() => toast.remove(), 300);
+              }, 3000);
+            }
+        </script>
+
         <script>
             // this keeps the arrow keys from scrolling the page when playing a game
             const gameContainer = document.getElementById("game-container");
@@ -149,6 +169,7 @@
             gameContainer.style.outline = "none";
             gameContainer.focus();
         </script>
+
         <script>
             // we want to disable scrolling (horizontally) so users dont see the "hidden" content panels
             document.body.style.overflowX = "hidden";
@@ -240,7 +261,7 @@
             });
         </script>
 
-
+        <div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-2"></div>
 
     </body>
 
