@@ -21,8 +21,6 @@ logger_versions = ["1.0", "1.5", "1.6"]
 
 titles = ["imvaders", "logger"]
 
-titles = ["imvaders", "logger"]
-
 
 def generate():
     while True:
@@ -63,14 +61,19 @@ def generate():
                     score = 99_999
                     movement = random.randint(4000, 5500)
                     level = 0
-                else: 
-                    score = random.randint(1500, 15000)
+                    duration = random.randint(1000, 2500)
+                elif version != "1.0" : 
+                    score = random.randint(500, 5000)
+                    movement = random.randint(300, 800)
+                else:
+                    score = random.randint(2500, 15000)
                     movement = random.randint(1800, 3000)
-            elif version == "1.5":
-                movement = round(duration * 1.2)
-                score = movement * 25
+            elif version == "1.5" or version == "1.6":
+                movement = round(duration * 0.8)
+                score = movement * 20
             else:
                 score = random.randint(1200, 11000)
+                duration = random.randint(80, 1000)
             scoreboard_update = {
                 "title": title,
                 "player_name": player,
