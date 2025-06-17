@@ -156,7 +156,8 @@
                 linkElement.appendChild(linkText);
 
                 const hintText = document.createElement("div");
-                hintText.textContent = question_link_text;
+                // Sanitize the hint content before rendering as HTML
+                hintText.innerHTML = DOMPurify.sanitize(question_link_text);
                 hintText.classList.add("hidden", "mt-2", "text-sm", "text-gray-300", "transition-all", "duration-200");
 
                 const toggleButton = document.createElement("button");
