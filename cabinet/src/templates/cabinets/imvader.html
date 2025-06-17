@@ -16,6 +16,26 @@
         window.soundVolume = 0;
       }
 
+      function createThrottler() {
+        const interval = 15;
+        let lastTime = 0;
+
+        return function shouldUpdate(timestamp) {
+          if (!lastTime) {
+            lastTime = timestamp;
+            return true;
+          }
+          const elapsed = timestamp - lastTime;
+          if (elapsed > interval) {
+            lastTime = timestamp - (elapsed % interval);
+            return true;
+          }
+          return false;
+        };
+      }
+
+      const shouldUpdate = createThrottler();
+
       let version = "0.5";
 
       async function getVersion() {
@@ -756,7 +776,13 @@
 
         drawMuteButton();
 
-        function gameLoop() {
+        function gameLoop(timestamp) {
+          if (!shouldUpdate(timestamp)) {
+            // skip this frame, but still queue the next one
+            requestAnimationFrame(gameLoop);
+            return;
+          }
+
           if (gameOver) {
             clearInterval(intervalID);
             intervalID = null;

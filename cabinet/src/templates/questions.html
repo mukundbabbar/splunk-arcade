@@ -28,6 +28,7 @@
           function showNextQuestion() {
             if (currentQuestionIndex > questions.length - 1) {
               window.location.href =  "{{ url_for('routes.home') }}";
+              return;
             }
 
             startTime = new Date().getTime();
@@ -89,25 +90,12 @@
 
                       await showFeedbackPopup(timeTaken, attemptsCount, quizQuestion);
 
-                      $.ajax({
-                          type: 'POST',
-                          url: '{{ url_for("routes.record_answer") }}',
-                          data: JSON.stringify({
-                              player_name: "{{ user_username }}",
-                              title: "{{ module }}",
-                              question: quizQuestion,
-                              attempts: attemptsCount,
-                              time_taken: timeTaken,
-                              source: window.questionSource
-                          }),
-                          contentType: 'application/json',
-                          success: function(response) {
-                              console.log('Answer recorded successfully:', response);
-                          },
-                          error: function(error) {
-                              console.log('Error recording answer:', error);
-                          }
-                      });
+                      try {
+                        await recordAnswer(quizQuestion, attemptsCount, timeTaken);
+                        console.log("Answer successfully recorded");
+                      } catch (error) {
+                        console.error("Failed to record answer:", error);
+                      }
 
                       if (question_post_prompt !== "") {
                         await showPostQuestionPrompt(question_post_prompt);
@@ -173,6 +161,22 @@
             const container = document.getElementById("question-container");
             container.innerHTML = "";
             container.appendChild(content);
+          }
+
+          function recordAnswer(quizQuestion, attemptsCount, timeTaken) {
+            return $.ajax({
+              type: 'POST',
+              url: '{{ url_for("routes.record_answer") }}',
+              data: JSON.stringify({
+                player_name: "{{ user_username }}",
+                title: "{{ module }}",
+                question: quizQuestion,
+                attempts: attemptsCount,
+                time_taken: timeTaken,
+                source: window.questionSource
+              }),
+              contentType: 'application/json',
+            });
           }
 
           function flashIncorrectAnswer() {
@@ -281,22 +285,22 @@
           }
 
           function sendFeedback(question, is_good) {
-              $.ajax({
-                  type: 'POST',
-                  url: "{{ url_for('routes.record_question_thumbs_up_down') }}",
-                  data: JSON.stringify({
-                      player_name: "{{ user_username }}",
-                      is_good: is_good,
-                      question: question,
-                  }),
-                  contentType: 'application/json',
-                  success: function(response) {
-                      console.log('Feedback recorded:', response);
-                  },
-                  error: function(error) {
-                      console.log('Error recording feedback:', error);
-                  }
-              });
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('routes.record_question_thumbs_up_down') }}",
+                data: JSON.stringify({
+                    player_name: "{{ user_username }}",
+                    is_good: is_good,
+                    question: question,
+                }),
+                contentType: 'application/json',
+            })
+            .done(function(response) {
+                console.log('Feedback recorded:', response);
+            })
+            .fail(function(error) {
+                console.log('Error recording feedback:', error);
+            });
           }
 
           function showPostQuestionPrompt(question_post_prompt) {
