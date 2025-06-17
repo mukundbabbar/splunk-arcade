@@ -16,7 +16,10 @@ players = [
    "buttercup"
 ]
 
-versions = ["0.5", "0.75", "1.0"]
+imvader_versions = ["0.5", "0.75", "1.0"]
+logger_versions = ["1.0", "1.5", "1.6"]
+
+titles = ["imvaders", "logger"]
 
 titles = ["imvaders", "logger"]
 
@@ -24,10 +27,10 @@ titles = ["imvaders", "logger"]
 def generate():
     while True:
         player = random.choice(players)
-        version = random.choice(versions)
         title = random.choice(titles)
 
         if title == "imvaders":
+            version = random.choice(imvader_versions)
             duration = random.randint(500, 1500)
             projectiles = random.randint(5, 200) 
             if player == "buttercup":
@@ -50,7 +53,7 @@ def generate():
                 "duration": duration
             }
         elif title == "logger":
-            version = "1.0"
+            version = random.choice(logger_versions)
             duration = random.randint(20, 300)
             level = random.randint(0, 5)
             movement = round(duration * 1.7)
@@ -63,6 +66,9 @@ def generate():
                 else: 
                     score = random.randint(1500, 15000)
                     movement = random.randint(1800, 3000)
+            elif version == "1.5":
+                movement = round(duration * 1.2)
+                score = movement * 25
             else:
                 score = random.randint(1200, 11000)
             scoreboard_update = {

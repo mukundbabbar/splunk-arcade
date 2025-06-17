@@ -323,7 +323,7 @@
                                 player_name: "{{ user_username }}",
                                 player_id: "{{ user_uuid }}",
                                 user_agent: navigator.userAgent,
-                                version: "v1.0",
+                                version: version,
                                 current_score: _score,
                                 level: _timesAtGoal,
                                 duration: gameDuration,
@@ -364,7 +364,7 @@
                                 player_name: "{{ user_username }}",
                                 player_id: "{{ user_uuid }}",
                                 user_agent: navigator.userAgent,
-                                version: "v1.0",
+                                version: version,
                                 current_score: _score,
                                 level: 5,
                                 duration: gameDuration,
@@ -414,7 +414,7 @@
                                 level: _timesAtGoal,
                                 duration: gameDuration,
                                 movement: _movementCount,
-                                version: "v1.0",
+                                version: version,
                                 message: "you killed a frog!",
                             };
                             console.log("loseLife dict:", dict);
@@ -498,7 +498,7 @@
                                     player_name: "{{ user_username }}",
                                     player_id: "{{ user_uuid }}",
                                     user_agent: navigator.userAgent,
-                                    version: "v1.0",
+                                    version: version,
                                     message: "hop hop hop",
                             };
 
@@ -521,7 +521,7 @@
                                     level: _timesAtGoal,
                                     duration: gameDuration,
                                     movement: _movementCount,
-                                    version: "v1.0"
+                                    version: version
                                 };
 
                                 $.ajax({
@@ -550,7 +550,7 @@
                                 player_name: "{{ user_username }}",
                                 player_id: "{{ user_uuid }}",
                                 user_agent: navigator.userAgent,
-                                version: "v1.0",
+                                version: version,
                                 message: "frog across!",
                                 duration: gameDuration,
                                 level: _timesAtGoal,

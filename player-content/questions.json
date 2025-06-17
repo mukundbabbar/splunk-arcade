@@ -3,7 +3,7 @@
     "fixed_order": [
       {
         "source": "static",
-        "question": "Who has the all time top score in v0.5?",
+        "question": "Who has the all time top score in <i>v0.5?</i>",
         "link_text": "Investigate HERE link to investigate in your Arcade dashboard in Splunk Observability Cloud",
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
@@ -76,8 +76,8 @@
       },
       {
         "source": "static",
-        "question": "Oops we may have introduced some bugs in version 0.75! Customers are saying they can’t fire enough projectiles. What metric could you use to verify this and perhaps even compare versions to each other?",
-        "link_text": "Check the Metric Finder for Imvader available metrics. To further investigate that metric click on its name and enter a chart builder. \nTo compare versions click the “Add analytics” button and choose Sum -> Sum:aggregation -> Group By: version",
+        "question": "Oops we may have introduced some bugs in version 0.75! Customers are saying they can’t fire enough projectiles. What metric could you use to verify this and perhaps even compare <i>versions</i> to each other?",
+        "link_text": "Check the Metric Finder for Imvader available metrics. To further investigate that metric click on its name and enter a chart builder. \nTo compare <i>versions</i> click the “Add analytics” button and choose <i>Sum</i> -> <i>Sum:aggregation</i> -> <i>Group By: version</i>",
         "link": "https://app.us1.signalfx.com/#/metrics?query=arcade.imvaders ",
         "choices": [
           {
@@ -129,19 +129,19 @@
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
           {
-            "prompt": "I need to get better at version 0.75",
+            "prompt": "I need to get better at version <i>0.75</i>",
             "is_correct": false
           },
           {
-            "prompt": "0.75 is faster than 0.50",
+            "prompt": "<i>0.75</i> is faster than <i>0.50</i>",
             "is_correct": false
           },
           {
-            "prompt": "v0.75 scores are, on average, lower than the v0.50 scores",
+            "prompt": "<i>v0.75</i> scores are, on average, lower than the <i>v0.50</i> scores",
             "is_correct": true
           },
           {
-            "prompt": "0.50 has more enemies",
+            "prompt": "<i>0.50</i> has more enemies",
             "is_correct": false
           }
         ],
@@ -403,70 +403,72 @@
     "fixed_order": [
       {
         "source": "static",
-        "question": "1. What is the `process.executable.name` associated with metrics coming from Logger ?",
-        "link_text": "Click Investigate HERE link to investigate in your Arcade dashboard in Splunk Observability Cloud",
-        "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__ click into a data chart for more information on individual metrics",
+        "question": "1.  It looks like someone might be exploiting and creating huge scores by holding down the left or right arrow keys. How could you investigate using the <i>arcade.logger.*</i> metrics available to you in the metric finder?",
+        "link_text": "You probably need to do sum mathematical! Check out the Investigation link provided to see available logger metrics.",
+        "link": "https://app.__REALM__.signalfx.com/#/metrics?query=arcade.logger",
         "choices": [
           {
-            "prompt": "/usr/bin/splunk",
+            "prompt": "Look for <i>arcade.logger.movement</i> values in Log Observer and compare log entries for times at goal by player.",
             "is_correct": false
           },
           {
-            "prompt": "/bin/logger",
+            "prompt": "Create a chart using <i>arcade.logger.movement</i> and <i>arcade.logger.score</i> both using <i>sum()</i> then subtract movement from score to see who has reached the goal and who has just been moving.",
             "is_correct": false
           },
           {
-            "prompt": "/usr/local/bin/cabinet",
+            "prompt": "Check the APM traces for <i>gameWon()</i> span tags and check the number of movements vs times at goal.",
             "is_correct": false
           },
           {
-            "prompt": "/usr/local/bin/python",
+            "prompt": "Create chart with <i>arcade.logger.duration</i> and <i>arcade.logger.movement</i> both using <i>sum()</i> by <i>player_name</i> then divide movement by duration to find who is moving the most during their play time.",
             "is_correct": true
           }
         ]
       },
       {
         "source": "static",
-        "question": "2. What version of Logger are you playing?",
+        "question": "2. How would you find the top 5 logger scores excluding any scores above <b>80,000</b>?",
+        "link_text": "Click the Investigate link to start plotting the chart. Remember that the order of functions applied matters!",
+        "link": "https://app.us1.signalfx.com/#/chart/v2/new?template=default&filters=sf_metric:arcade.logger.score&startTime=-1h&endTime=Now",
         "choices": [
           {
-            "prompt": "1.0.0",
+            "prompt": "Copy the IMvaders Top 5 scores chart and change the <i>title</i> filter.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Create a chart with <i>arcade.logger.score</i> apply a <i>Top<i/> function with the value <i>5<i/>, apply <i>Ceiling</i> function above 80000, then apply a <i>Maximum</i> function across the Dashboard window.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Create a chart with <i>arcade.logger.score</i> apply <i>Maximum</i> function across the Dashboard window and apply a <i>Ceiling</i> function above 80000, then set the chart visualization to <i>list</i> view to see the top 5.",
+            "is_correct": false
+          },
+          {
+            "prompt": "Create a chart with <i>arcade.logger.score</i> apply <i>Maximum</i> function across the Dashboard window, apply <i>Exclude</i> function above 80000, then apply a <i>Top</i> function with the value 5",
             "is_correct": true
-          },
-          {
-            "prompt": "2",
-            "is_correct": false
-          },
-          {
-            "prompt": "1.25.1",
-            "is_correct": false
-          },
-          {
-            "prompt": "The same version as our kubernetes cluster!",
-            "is_correct": false
           }
         ]
       },
       {
         "source": "static",
-        "question": "The logs are trying to WARN you about something. What is it?",
-        "link_text": "Investigate HERE link to investigate in Splunk Log Observer",
-        "link": "https://app.__REALM__.signalfx.com/#/logs?SI=%7B%22selectedIndexes%22:%5B%7B%22__typename%22:%22SplunkEnterpriseIndex%22,%22indexID%22:%22GHVu2ULA4AE:splunk-arcade%22,%22name%22:%22splunk-arcade%22%7D%5D%7D&astate=%7B%22isStreaming%22:false,%22showLiveTail%22:false,%22liveTailOn%22:false%7D&iq=%7B%22selectedIntegrationId%22:%22GHVu2ULA4AE%22%7D&qd=%7B%22timeRange%22:%7B%22earliest%22:%22-15m%22,%22latest%22:%22now%22%7D,%22filters%22:%5B%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22logger%22%5D,%22field%22:%7B%22name%22:%22title%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D,%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22kube:container:player%22%5D,%22field%22:%7B%22name%22:%22sourcetype%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D%5D,%22aggregations%22:%5B%7B%22field%22:%22All%20(*)%22,%22aggregationFn%22:%22COUNT%22%7D%5D,%22groupings%22:%5B%7B%22field%22:%22severity%22%7D%5D,%22resolution%22:10,%22limit%22:10000,%22summaryLimit%22:150000,%22searchTimeRules%22:%5B%5D,%22useTopRecords%22:150000%7D",
+        "question": "3. Which two directly connected APM services are responsible for <b>GET</b>ting progression and <b>POST</b>ing game score?",
+        "link_text": "Investigate your services and their endpoints at the link provided!",
+        "link": "https://app.us1.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D%7D",
         "choices": [
           {
-            "prompt": "The frog should try to find some flies.",
+            "prompt": "<i>splunk-arcade-cabinet-__PLAYER_NAME__</i> and <i>redis</i>.",
             "is_correct": false
           },
           {
-            "prompt": "The logs are moving too fast.",
+            "prompt": "<i>splunk-arcade-scoreboard</i> and <i>redis</i>",
             "is_correct": false
           },
           {
-            "prompt": "There is no music. With no music is no desire to cross.",
+            "prompt": "<i>splunk-arcade-scoreboard</i> and <i>postgresql:myapp</i>",
             "is_correct": false
           },
           {
-            "prompt": "There's a real problem with shrinkage. Too much shrinking.",
+            "prompt": "<i>splunk-arcade-cabinet-player-__PLAYER_NAME__</i> and <i>splunk-arcade-scoreboard</i>",
             "is_correct": true
           }
         ]

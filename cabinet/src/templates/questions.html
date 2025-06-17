@@ -19,11 +19,15 @@
         }
         </style>
 
+        <!-- Include DOMPurify for sanitizing inputs -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
+
         <script>
           let startTime = null;
           let attemptsCount = 0;
           let questions = {{ question_content | tojson }};
           let currentQuestionIndex = 0;
+          let question = null
 
           function showNextQuestion() {
             if (currentQuestionIndex > questions.length - 1) {
@@ -34,38 +38,43 @@
             startTime = new Date().getTime();
 
             const question_content = questions[currentQuestionIndex];
-            const question = question_content.question;
+            question = question_content.question; // Question text with potential HTML
             const question_link = question_content.link;
             const question_link_text = question_content.link_text;
             const question_post_prompt = question_content?.post_prompt ?? '';
             const optionsList = document.createElement("ul");
             optionsList.classList.add("space-y-2");
 
+            // Sanitize the question text using DOMPurify
+            question = DOMPurify.sanitize(question);
+
             const options = ['A', 'B', 'C', 'D'];
             const randomizedPrompts = [...question_content.choices].sort(() => Math.random() - 0.5);
 
-            options.forEach((option, idx) => {
+            randomizedPrompts.forEach((choice, idx) => {
                 const li = document.createElement("li");
                 li.classList.add("flex", "items-center");
 
                 const input = document.createElement("input");
                 input.type = "radio";
                 input.name = "quiz-answer";
-                input.value = randomizedPrompts[idx].prompt;
-                input.id = `option-${option}`;
+                input.value = choice.prompt;
+                input.id = `option-${options[idx]}`;
                 input.classList.add("mr-2", "accent-cyan-600");
 
                 const label = document.createElement("label");
-                label.setAttribute("for", `option-${option}`);
+                label.setAttribute("for", `option-${options[idx]}`);
                 label.classList.add("text-white", "cursor-pointer");
-                label.textContent = randomizedPrompts[idx].prompt;
+
+                // Sanitize each choice before rendering
+                label.innerHTML = DOMPurify.sanitize(choice.prompt);
 
                 li.appendChild(input);
                 li.appendChild(label);
                 optionsList.appendChild(li);
 
-                if (randomizedPrompts[idx].is_correct) {
-                    window.correctAnswer = option;
+                if (choice.is_correct) {
+                    window.correctAnswer = options[idx];
                 }
             });
 
@@ -74,8 +83,6 @@
             submitButton.classList.add("w-full", "bg-cyan-600", "hover:bg-cyan-700", "text-white", "py-2", "px-4", "rounded-lg", "mt-4");
             submitButton.onclick = async function () {
                 const selectedOption = document.querySelector('input[name="quiz-answer"]:checked');
-                const quizModal = document.getElementById("quiz-modal");
-                const quizBackdrop = document.getElementById("quiz-backdrop");
 
                 if (selectedOption) {
                     const selectedAnswer = selectedOption.id.split("-")[1];
@@ -83,41 +90,56 @@
                     attemptsCount++;
 
                     if (selectedAnswer === window.correctAnswer) {
-                      const quizQuestion = document.querySelector("#quiz-question").textContent;
+                        const quizQuestion = document.querySelector("#quiz-question").textContent;
 
-                      const endTime = new Date().getTime();
-                      const timeTaken = (endTime - startTime) / 1000;
+                        const endTime = new Date().getTime();
+                        const timeTaken = (endTime - startTime) / 1000;
 
-                      await showFeedbackPopup(timeTaken, attemptsCount, quizQuestion);
+                        await showFeedbackPopup(timeTaken, attemptsCount, quizQuestion);
 
-                      try {
-                        await recordAnswer(quizQuestion, attemptsCount, timeTaken);
-                        console.log("Answer successfully recorded");
-                      } catch (error) {
-                        console.error("Failed to record answer:", error);
-                      }
+                        $.ajax({
+                            type: 'POST',
+                            url: '{{ url_for("routes.record_answer") }}',
+                            data: JSON.stringify({
+                                player_name: "{{ user_username }}",
+                                title: "{{ module }}",
+                                question: quizQuestion,
+                                attempts: attemptsCount,
+                                time_taken: timeTaken,
+                                source: window.questionSource
+                            }),
+                            contentType: 'application/json',
+                            success: function(response) {
+                                console.log('Answer recorded successfully:', response);
+                            },
+                            error: function(error) {
+                                console.log('Error recording answer:', error);
+                            }
+                        });
 
-                      if (question_post_prompt !== "") {
-                        await showPostQuestionPrompt(question_post_prompt);
+                        if (question_post_prompt !== "") {
+                            await showPostQuestionPrompt(question_post_prompt);
+                            window.location.href = "{{ url_for('routes.home') }}";
+                            return; // Also add return here after redirect
+                        }
 
-                        window.location.href =  "{{ url_for('routes.home') }}";
-                      }
+                        startTime = null;
+                        attemptsCount = 0;
 
-                      startTime = null;
-                      attemptsCount = 0;
+                        currentQuestionIndex++;
+                        showNextQuestion();
 
-                      currentQuestionIndex++;
-                      showNextQuestion();
-
-                      return;
+                        return; // Add return here after successfully showing the next question
                     }
-                };
+                }
 
                 flashIncorrectAnswer();
             };
 
             const content = document.createElement("div");
             content.classList.add("space-y-4");
+
+            // Use sanitized question text
             content.innerHTML = `<p id="quiz-question" class="text-lg font-medium">${question}</p>`;
 
             if (question_link && question_link_text) {
@@ -125,7 +147,7 @@
                 wrapper.classList.add("text-center", "mt-4");
 
                 const linkElement = document.createElement("a");
-                linkElement.href = question_link;
+                linkElement.href = DOMPurify.sanitize(question_link); // Sanitize the link URL
                 linkElement.target = "_blank";
                 linkElement.classList.add("text-cyan-400", "hover:text-cyan-500", "inline-flex", "items-center", "gap-1");
 
@@ -229,10 +251,10 @@
                   );
 
                   feedbackElement.innerHTML = `
-          <p class="text-xl font-bold text-center">Correct!</p>
-          <p class="text-center">It took you ${timeTaken.toFixed(2)} seconds and ${attemptsCount} attempt(s).</p>
-          <p class="text-center">Hey, if you liked this question, give it a thumbs up. If it wasn't so great, give it a thumbs down.</p>
-          `;
+                  <p class="text-xl font-bold text-center">Correct!</p>
+                  <p class="text-center">It took you ${timeTaken.toFixed(2)} seconds and ${attemptsCount} attempt(s).</p>
+                  <p class="text-center">Hey, if you liked this question, give it a thumbs up. If it wasn't so great, give it a thumbs down.</p>
+                  `;
 
                   const thumbsContainer = document.createElement("div");
                   thumbsContainer.classList.add("flex", "justify-center", "space-x-4");
@@ -240,7 +262,7 @@
                   const thumbsUpBtn = document.createElement("button");
                   thumbsUpBtn.classList.add("bg-green-600", "text-white", "px-4", "py-2", "rounded-lg", "hover:bg-green-700", "transition");
                   thumbsUpBtn.textContent = "👍";
-                  thumbsUpBtn.onclick = function() {
+                  thumbsUpBtn.onclick = function () {
                       feedbackElement.remove();
                       backdrop.remove();
                       sendFeedback(question, true);
@@ -250,7 +272,7 @@
                   const thumbsDownBtn = document.createElement("button");
                   thumbsDownBtn.classList.add("bg-red-600", "text-white", "px-4", "py-2", "rounded-lg", "hover:bg-red-700", "transition");
                   thumbsDownBtn.textContent = "👎";
-                  thumbsDownBtn.onclick = function() {
+                  thumbsDownBtn.onclick = function () {
                       feedbackElement.remove();
                       backdrop.remove();
                       sendFeedback(question, false);
@@ -265,7 +287,7 @@
                   closeButton.textContent = "❌";
                   closeButton.classList.add("absolute", "top-2", "right-2", "text-white", "text-xl", "bg-transparent", "border-none", "cursor-pointer");
 
-                  closeButton.onclick = function() {
+                  closeButton.onclick = function () {
                       feedbackElement.remove();
                       backdrop.remove();
                       resolve();
@@ -280,8 +302,7 @@
 
                   document.body.appendChild(backdrop);
                   document.body.appendChild(feedbackElement);
-              })
-
+              });
           }
 
           function sendFeedback(question, is_good) {
@@ -304,51 +325,50 @@
           }
 
           function showPostQuestionPrompt(question_post_prompt) {
-            return new Promise((resolve) => {
-              const main = document.getElementById("question-container");
+              return new Promise((resolve) => {
+                  const main = document.getElementById("question-container");
 
-              const existingFeedback = document.getElementById("post-question-prompt-box");
-              if (existingFeedback) {
-                existingFeedback.remove();
-              }
+                  const existingFeedback = document.getElementById("post-question-prompt-box");
+                  if (existingFeedback) {
+                      existingFeedback.remove();
+                  }
 
-              document.body.classList.add("blur-background");
+                  document.body.classList.add("blur-background");
 
-              const feedbackElement = document.createElement("div");
-              feedbackElement.id = "post-question-prompt-box";
-              feedbackElement.classList.add(
-                "fixed", "left-1/2", "top-1/2", "transform", "-translate-x-1/2", "-translate-y-1/2",
-                "bg-pink-500", "text-white", "px-6", "py-4", "text-center",
-                "rounded-lg", "shadow-lg", "z-[9999]", "max-w-md", "w-full"
-              );
+                  const feedbackElement = document.createElement("div");
+                  feedbackElement.id = "post-question-prompt-box";
+                  feedbackElement.classList.add(
+                      "fixed", "left-1/2", "top-1/2", "transform", "-translate-x-1/2", "-translate-y-1/2",
+                      "bg-pink-500", "text-white", "px-6", "py-4", "text-center",
+                      "rounded-lg", "shadow-lg", "z-[9999]", "max-w-md", "w-full"
+                  );
 
-              const messageContent = document.createElement("div");
-              messageContent.textContent = question_post_prompt;
-              messageContent.classList.add("mb-4");
+                  const messageContent = document.createElement("div");
+                  messageContent.textContent = question_post_prompt;
+                  messageContent.classList.add("mb-4");
 
-              const closeButton = document.createElement("button");
-              closeButton.textContent = "OK";
-              closeButton.classList.add(
-                "bg-white", "text-pink-500", "px-4", "py-2", "rounded-lg",
-                "font-bold", "cursor-pointer", "hover:bg-gray-200"
-              );
+                  const closeButton = document.createElement("button");
+                  closeButton.textContent = "OK";
+                  closeButton.classList.add(
+                      "bg-white", "text-pink-500", "px-4", "py-2", "rounded-lg",
+                      "font-bold", "cursor-pointer", "hover:bg-gray-200"
+                  );
 
-              closeButton.onclick = () => {
-                feedbackElement.remove();
-                document.body.classList.remove("blur-background");
-                resolve();
-              };
+                  closeButton.onclick = () => {
+                      feedbackElement.remove();
+                      document.body.classList.remove("blur-background");
+                      resolve();
+                  };
 
-              feedbackElement.appendChild(messageContent);
-              feedbackElement.appendChild(closeButton);
-              main.appendChild(feedbackElement);
-            })
+                  feedbackElement.appendChild(messageContent);
+                  feedbackElement.appendChild(closeButton);
+                  main.appendChild(feedbackElement);
+              });
           }
 
           document.addEventListener("DOMContentLoaded", function () {
-            showNextQuestion();
+              showNextQuestion();
           });
-
         </script>
     </head>
     <body class="min-h-screen flex flex-col bg-gray-800 bg-cover bg-center" style="background-image: url('{{ url_for('static', filename='images/arcade_bg_.png') }}');">
@@ -373,7 +393,6 @@
             <!-- question rendered here -->
           </div>
         </main>
-
 
     </body>
 
