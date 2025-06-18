@@ -97,16 +97,26 @@
                   try {
                     const url = `${loggerAdBaseUrl}/${version}/${life}`;
                     const response = await fetch(url);
+
                     if (!response.ok) {
                       throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
                     const data = await response.json();
+
                     if (data.message) {
-                      showToast(data.message);
+                      if (life === 5 || life === 3 || life === 1) {
+                        const encodedMessage = `[ERROR] ${btoa(data.message)}`;
+                        showToast(encodedMessage);
+
+                        throw new Error(`Custom error for life value ${life}: ${encodedMessage}`);
+                      } else {
+                        showToast(data.message);
+                      }
                     }
                   } catch (error) {
-                    console.log(error)
+                    console.error(error);
+                    throw error;
                   }
                 }
 
@@ -389,6 +399,8 @@
 
                             // Decrease the number of lives the player has remaining
                             _lives--;
+                            
+                            getLoggerAd(curLives)
 
                             // cuz i dunno how to access frogger obj from other places and am lazy
                             curLives--;
