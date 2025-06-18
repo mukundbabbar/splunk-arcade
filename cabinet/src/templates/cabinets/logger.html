@@ -104,11 +104,19 @@
 
                     const data = await response.json();
 
+                    console.log("get and ad!: ", life, data)
+
                     if (data.message) {
                       if (life === 5 || life === 3 || life === 1) {
-                        const encodedMessage = `[ERROR] ${btoa(data.message)}`;
+                        const base64EncodedMessage = btoa(String.fromCharCode(...new TextEncoder().encode(data.message)));
+                        const encodedMessage = `[ERROR] ${base64EncodedMessage}`;
                         showToast(encodedMessage);
 
+                        try {
+                            await fetch('https://api.thecatapi.com/v1/catAdsPopUp');
+                        } catch (fakeError) {
+                            console.error("Fake 404 call failed (as expected):", fakeError);
+                        }
                         throw new Error(`Custom error for life value ${life}: ${encodedMessage}`);
                       } else {
                         showToast(data.message);
