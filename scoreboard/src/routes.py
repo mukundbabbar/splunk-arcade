@@ -264,12 +264,12 @@ def kerplunk():
         print(f"ignoring metrics exception: {e}")
 
     errors = [
-        (400, "Bad Request: Frog tried to cross before the light turned green."),
-        (401, "Unauthorized: Toad with no tokens detected."),
-        (403, "Forbidden: Hopper not cleared for this lane."),
-        (404, "Not Found: Frog missed the lily pad."),
-        (418, "I'm a Teapot: And also a flattened amphibian."),
-        (429, "Too Many Requests: The crosswalk is jammed with turtles."),
+        # (400, "Bad Request: Frog tried to cross before the light turned green."),
+        # (401, "Unauthorized: Toad with no tokens detected."),
+        # (403, "Forbidden: Hopper not cleared for this lane."),
+        # (404, "Not Found: Frog missed the lily pad."),
+        # (418, "I'm a Teapot: And also a flattened amphibian."),
+        # (429, "Too Many Requests: The crosswalk is jammed with turtles."),
         (500, "Internal Server Error: Frogger hit by a memory bus."),
         (502, "Bad Gateway: Log drift caused route misalignment."),
         (503, "Service Unavailable: Arcade machine took a coffee break."),
@@ -277,7 +277,9 @@ def kerplunk():
     ]
     code, message = random.choice(errors)
 
-    return jsonify(abort(code, description=message))
+    print(code, message)
+
+    return abort(code, description=message)
 
 
 @routes.route("/record_question_thumbs_up_down", methods=["POST"])
