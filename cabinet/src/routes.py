@@ -287,18 +287,23 @@ def get_logger_ad(version: str, life: int):
         "Avoid snakes. It’s not that deep.",
         "Friends don’t let frogs play in traffic."
     ]
-
-    if life !=3 or version != "1.0":
-        return {"message": random.choice(ads)}
+    headers = {"Content-Type": "application/json"}
+    payload = {"title": "ad request", "key": "no401"}
 
     try:
         ret = requests.post(
-            f"http://{SCOREBOARD_HOST}/kerplunk",
+            f"http://{SCOREBOARD_HOST}/kerplunk", json=payload, headers=headers
         )
         print(ret.status_code, ret.text)
     except Exception as exc:
         _ = exc
         pass
+
+    if life == 5 or version != "1.0":
+        return {"message": random.choice(ads)}
+    else:
+        return {"message": "[ERROR] Ad failure ZGFlZCBzaSBncm9mLiBkYWVkIGlzIGx1YXAuIA=="}
+
 
     return {}
 
