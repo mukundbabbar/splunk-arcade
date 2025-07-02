@@ -3,7 +3,7 @@
     "fixed_order": [
       {
         "source": "static",
-        "question": "Who has the all time top score in v0.5?",
+        "question": "Who has the all time top score in <code>v0.5?</code>",
         "link_text": "Investigate HERE link to investigate in your Arcade dashboard in Splunk Observability Cloud",
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
@@ -32,26 +32,26 @@
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
           {
-            "prompt": "arcade.score",
+            "prompt": "<code>arcade.score</code>",
             "is_correct": false
           },
           {
-            "prompt": "invaders.cabinet.score",
+            "prompt": "<code>invaders.cabinet.score</code>",
             "is_correct": false
           },
           {
-            "prompt": "score.imvaders.arcade",
+            "prompt": "<code>score.imvaders.arcade</code>",
             "is_correct": false
           },
           {
-            "prompt": "arcade.imvaders.score",
+            "prompt": "<code>arcade.imvaders.score</code>",
             "is_correct": true
           }
         ]
       },
       {
         "source": "static",
-        "question": "What is the name of the database connected to splunk-arcade-cabinet-player-__PLAYER_NAME__ service?",
+        "question": "What is the name of the database connected to <code>splunk-arcade-cabinet-player-__PLAYER_NAME__</code> service?",
         "link_text": "Investigate HERE link to see your game cabinet, and dependencies, in an APM map (If you died quickly you may be faster than your data. Refresh the dashboard after a brief pause).",
         "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%225gvum%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-cabinet-player-__PLAYER_NAME__%22%7D%5D%7D%5D&startTime=-15m",
         "choices": [
@@ -76,24 +76,24 @@
       },
       {
         "source": "static",
-        "question": "Oops we may have introduced some bugs in version 0.75! Customers are saying they can’t fire enough projectiles. What metric could you use to verify this and perhaps even compare versions to each other?",
-        "link_text": "Check the Metric Finder for Imvader available metrics. To further investigate that metric click on its name and enter a chart builder. \nTo compare versions click the “Add analytics” button and choose Sum -> Sum:aggregation -> Group By: version",
-        "link": "https://app.us1.signalfx.com/#/metrics?query=arcade.imvaders ",
+        "question": "Oops we may have introduced some bugs in version <code>0.75</code>! Customers are saying they can’t fire enough projectiles. What metric could you use to verify this and perhaps even compare <code>versions</code> to each other?",
+        "link_text": "Check the Metric Finder for Imvader available metrics. To further investigate that metric click on its name and enter a chart builder. \nTo compare <code>versions</code> click the “Add analytics” button and choose <code>Sum</code> -> <code>Sum:aggregation</code> -> <code>Group By: version</code>",
+        "link": "https://app.__REALM__.signalfx.com/#/metrics?query=arcade.imvaders ",
         "choices": [
           {
-            "prompt": "imvaders.shots",
+            "prompt": "<code>imvaders.shots</code>",
             "is_correct": false
           },
           {
-            "prompt": "arcade.imvaders.level",
+            "prompt": "<code>arcade.imvaders.level</code>",
             "is_correct": false
           },
           {
-            "prompt": "arcade.imvaders.projectiles",
+            "prompt": "<code>arcade.imvaders.projectiles</code>",
             "is_correct": true
           },
           {
-            "prompt": "imvaders.arcade.projectiles",
+            "prompt": "<code>imvaders.arcade.projectiles</code>",
             "is_correct": false
           }
         ]
@@ -105,19 +105,19 @@
         "link": "https://app.__REALM__.signalfx.com/#/apm/analysis?analyze=errors&endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D,%22spanFilters%22:%5B%7B%22tags%22:%5B%7B%22tag%22:%22sf_service%22,%22operation%22:%22IN%22,%22values%22:%5B%22splunk-arcade-scoreboard%22%5D%7D%5D%7D%5D%7D&selected=%5B%7B%22nodeID%22:%22l1jian%22,%22nodeTags%22:%5B%7B%22tagName%22:%22sf_service%22,%22value%22:%22splunk-arcade-scoreboard%22%7D%5D%7D%5D&serviceTo=splunk-arcade-scoreboard&startTime=-1h",
         "choices": [
           {
-            "prompt": "/player_progression",
+            "prompt": "<code>/player_progression</code>",
             "is_correct": false
           },
           {
-            "prompt": "/record_quiz_scores",
+            "prompt": "<code>/record_quiz_scores</code>",
             "is_correct": false
           },
           {
-            "prompt": "/alive",
+            "prompt": "<code>/alive</code>",
             "is_correct": false
           },
           {
-            "prompt": "/blackhole_sun",
+            "prompt": "<code>/blackhole_sun</code>",
             "is_correct": true
           }
         ]
@@ -129,19 +129,19 @@
         "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__",
         "choices": [
           {
-            "prompt": "I need to get better at version 0.75",
+            "prompt": "I need to get better at version <code>0.75</code>",
             "is_correct": false
           },
           {
-            "prompt": "0.75 is faster than 0.50",
+            "prompt": "<code>0.75</code> is faster than <code>0.50</code>",
             "is_correct": false
           },
           {
-            "prompt": "v0.75 scores are, on average, lower than the v0.50 scores",
+            "prompt": "<code>v0.75</code> scores are, on average, lower than the <code>v0.50</code> scores",
             "is_correct": true
           },
           {
-            "prompt": "0.50 has more enemies",
+            "prompt": "<code>0.50</code> has more enemies",
             "is_correct": false
           }
         ],
@@ -403,142 +403,144 @@
     "fixed_order": [
       {
         "source": "static",
-        "question": "1. What is the `process.executable.name` associated with metrics coming from Logger ?",
-        "link_text": "Click Investigate HERE link to investigate in your Arcade dashboard in Splunk Observability Cloud",
-        "link": "https://app.__REALM__.signalfx.com/#/dashboard/__DASHBOARD__ click into a data chart for more information on individual metrics",
+        "question": "It looks like someone might be exploiting and creating huge scores by holding down the left or right arrow keys. How could you investigate using the <code>arcade.logger.*</code> metrics available to you in the metric finder?",
+        "link_text": "You probably need to do <code>sum()</code> math magic with the <b>duration</b> of the game! Check out the Investigation link provided to see available logger metrics. Click into one and start charting!",
+        "link": "https://app.__REALM__.signalfx.com/#/metrics?query=arcade.logger",
         "choices": [
           {
-            "prompt": "/usr/bin/splunk",
+            "prompt": "Look for <code>arcade.logger.movement</code> values in Log Observer and compare log entries for times at goal by player.",
             "is_correct": false
           },
           {
-            "prompt": "/bin/logger",
+            "prompt": "Create a chart using <code>arcade.logger.movement</code> and <code>arcade.logger.score</code> both using <code>sum()</code> then subtract movement from score to see who has reached the goal and who has just been moving.",
             "is_correct": false
           },
           {
-            "prompt": "/usr/local/bin/cabinet",
+            "prompt": "Check the APM traces for <code>gameWon()</code> span tags and check the number of movements vs times at goal.",
             "is_correct": false
           },
           {
-            "prompt": "/usr/local/bin/python",
+            "prompt": "Create chart with <code>arcade.logger.duration</code> and <code>arcade.logger.movement</code> both using <code>sum()</code> by <code>player_name</code> then divide movement by duration to find who is moving the most during their play time.",
             "is_correct": true
           }
         ]
       },
       {
         "source": "static",
-        "question": "2. What version of Logger are you playing?",
+        "question": "How would you find the top 5 logger scores excluding any scores above <b>80,000</b>?",
+        "link_text": "Click the Investigate link to start plotting the chart. Remember that the order of functions applied matters!",
+        "link": "https://app.__REALM__.signalfx.com/#/chart/v2/new?template=default&filters=sf_metric:arcade.logger.score&startTime=-1h&endTime=Now",
         "choices": [
           {
-            "prompt": "1.0.0",
-            "is_correct": true
-          },
-          {
-            "prompt": "2",
+            "prompt": "Copy the IMvaders Top 5 scores chart and change the <code>title</code> filter.",
             "is_correct": false
           },
           {
-            "prompt": "1.25.1",
+            "prompt": "Create a chart with <code>arcade.logger.score</code> apply a <code>Top</code> function with the value <code>5</code>, apply <code>Ceiling</code> function above 80000, then apply a <code>Maximum</code> transformation function across the Dashboard window.",
             "is_correct": false
           },
           {
-            "prompt": "The same version as our kubernetes cluster!",
-            "is_correct": false
-          }
-        ]
-      },
-      {
-        "source": "static",
-        "question": "The logs are trying to WARN you about something. What is it?",
-        "link_text": "Investigate HERE link to investigate in Splunk Log Observer",
-        "link": "https://app.__REALM__.signalfx.com/#/logs?SI=%7B%22selectedIndexes%22:%5B%7B%22__typename%22:%22SplunkEnterpriseIndex%22,%22indexID%22:%22GHVu2ULA4AE:splunk-arcade%22,%22name%22:%22splunk-arcade%22%7D%5D%7D&astate=%7B%22isStreaming%22:false,%22showLiveTail%22:false,%22liveTailOn%22:false%7D&iq=%7B%22selectedIntegrationId%22:%22GHVu2ULA4AE%22%7D&qd=%7B%22timeRange%22:%7B%22earliest%22:%22-15m%22,%22latest%22:%22now%22%7D,%22filters%22:%5B%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22logger%22%5D,%22field%22:%7B%22name%22:%22title%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D,%7B%22kind%22:%22FIELD%22,%22values%22:%5B%22kube:container:player%22%5D,%22field%22:%7B%22name%22:%22sourcetype%22%7D,%22type%22:%22include%22,%22isNumeric%22:false%7D%5D,%22aggregations%22:%5B%7B%22field%22:%22All%20(*)%22,%22aggregationFn%22:%22COUNT%22%7D%5D,%22groupings%22:%5B%7B%22field%22:%22severity%22%7D%5D,%22resolution%22:10,%22limit%22:10000,%22summaryLimit%22:150000,%22searchTimeRules%22:%5B%5D,%22useTopRecords%22:150000%7D",
-        "choices": [
-          {
-            "prompt": "The frog should try to find some flies.",
+            "prompt": "Create a chart with <code>arcade.logger.score</code> apply <code>Maximum</code> transformation function across the Dashboard window and apply a <code>Ceiling</code> function above 80000, then set the chart visualization to <code>list</code> view to see the top 5.",
             "is_correct": false
           },
           {
-            "prompt": "The logs are moving too fast.",
-            "is_correct": false
-          },
-          {
-            "prompt": "There is no music. With no music is no desire to cross.",
-            "is_correct": false
-          },
-          {
-            "prompt": "There's a real problem with shrinkage. Too much shrinking.",
+            "prompt": "Create a chart with <code>arcade.logger.score</code> apply <code>Maximum</code> transformation function across the Dashboard window, apply <code>Exclude</code> function above 80000, then apply a <code>Top</code> function with the value 5",
             "is_correct": true
           }
         ]
       },
       {
         "source": "static",
-        "question": "What's the score from this trace?",
-        "link_text": "Investigate HERE link to see the trace",
-        "link": "https://app.__REALM__.signalfx.com/#/apm/traces/3517415934adc33fc4bf553d4d7bb1ec",
+        "question": "Which two directly connected APM services are responsible for <b>GET</b>ting <code>/get_logger_ad</code> and <b>GET</b>ting <code>/player_progression</code>?",
+        "link_text": "Investigate your services and their endpoints at the link provided!",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&filters=%7B%22traceFilter%22:%7B%22tags%22:%5B%7B%22tag%22:%22sf_environment%22,%22operation%22:%22IN%22,%22values%22:%5B%22gameify%22%5D%7D%5D%7D%7D",
         "choices": [
           {
-            "prompt": "250",
+            "prompt": "<code>splunk-arcade-cabinet-__PLAYER_NAME__</code> and <code>redis</code>.",
             "is_correct": false
           },
           {
-            "prompt": "370",
+            "prompt": "<code>splunk-arcade-scoreboard</code> and <code>redis</code>",
+            "is_correct": false
+          },
+          {
+            "prompt": "<code>splunk-arcade-scoreboard</code> and <code>postgresql:myapp</code>",
+            "is_correct": false
+          },
+          {
+            "prompt": "<code>splunk-arcade-cabinet-player-__PLAYER_NAME__</code> and <code>splunk-arcade-scoreboard</code>",
             "is_correct": true
-          },
-          {
-            "prompt": "490",
-            "is_correct": false
-          },
-          {
-            "prompt": "1,000,000",
-            "is_correct": false
           }
         ]
       },
       {
         "source": "static",
-        "question": "What is the longest jinja span?",
-        "link_text": "Investigate HERE link to see the trace",
-        "link": "https://app.__REALM__.signalfx.com/#/apm/traces/da24bd449d4150153fd6a2c2c218ad15",
+        "question": "There appear to be some errors happening with our 3rd party ad provider Kerplunk. Using the APM data what sort of errors do you find for <code>/kerplunkAds</code>?",
+        "link_text": "Check the <code>splunk-arcade-scoreboard</code> service <code>/kerplunkAds</code> endpoint for traces with errors. To more easily see just the traces with errors select the <b>APM service</b> bubble -> click into <b>Traces</b> -> click <b>Errors Only</b>.",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&sf_environment=gameify",
         "choices": [
           {
-            "prompt": "jinja2.render",
+            "prompt": "Unhandled exception in python",
+            "is_correct": false
+          },
+          {
+            "prompt": "302 and 304 ending in 'too many redirects'",
+            "is_correct": false
+          },
+          {
+            "prompt": "401 insecure",
+            "is_correct": false
+          },
+          {
+            "prompt": "502 and 503 errors",
             "is_correct": true
-          },
-          {
-            "prompt": "jinja2.load",
-            "is_correct": false
-          },
-          {
-            "prompt": "jinja2.compile",
-            "is_correct": false
-          },
-          {
-            "prompt": "jinja2.hair_color",
-            "is_correct": false
           }
         ]
       },
       {
         "source": "static",
-        "question": "What are the number of pods running at this time?",
-        "link_text": "Investigate HERE link to view kubernetes navigator",
-        "link": "https://app.__REALM__.signalfx.com/#/infra/entity/k8sdeployments?dashboardId=GbkHF6BA4WY&endTimeUTC=1740008760000&mapSelection=splunk-arcade-player-router%20%7C%20splunk-arcade%20%7C%20gamify&metricClass=default&startTimeUTC=1739994360000",
+        "question": "Which of these endpoints in the gameify environment has the highest latency?",
+        "link_text": "Investigate your <code>splunk-arcade-cabinet-player-__PLAYER_NAME__</code> service and any associated services endpoints!",
+        "link": "https://app.__REALM__.signalfx.com/#/apm/troubleshooting?endTime=Now&sf_environment=gameify",
         "choices": [
           {
-            "prompt": "2",
+            "prompt": "<code>splunk-arcade-scoreboard</code> service and <code>POST /black_hole</code> endpoint",
             "is_correct": false
           },
           {
-            "prompt": "3",
+            "prompt": "<code>splunk-arcade-cabinet-__PLAYER_NAME__</code> service and <code>POST /audit</code> endpoint",
             "is_correct": false
           },
           {
-            "prompt": "4",
+            "prompt": "<code>splunk-arcade-scoreboard</code> service and <code>GET /player_progression</code> endpoint",
             "is_correct": false
           },
           {
-            "prompt": "5",
+            "prompt": "<code>splunk-arcade-cabinet-__PLAYER_NAME__</code> service and <code>GET /get_logger_ad/&lt;string:version&gt;/&lt;int:life&gt;</code> endpoint",
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "source": "static",
+        "question": "Moving Left stopped working correctly this version (<code>1.5</code>) We are sending failed movements to our <code>/audit</code> endpoint but it does not seem to be working either. How would you most quickly troubleshoot the <code>POST /audit</code> endpoint?",
+        "link_text": "HTTP Response codes are a prominent part of which kind of telemetry?",
+        "link": "https://app.__REALM__.signalfx.com/#/apm?environments=gameify",
+        "choices": [
+          {
+            "prompt": "Log Observer -> Choose Index = <code>splunk-arcade</code> -> Select version : <code>1.5</code> -> Select endpoint : <code>/audit</code>",
+            "is_correct": false
+          },
+          {
+            "prompt": "APM -> Tag Spotlight -> Click <code>version</code> and Add to Chart -> Click into <code>/audit</code> endpoint",
+            "is_correct": false
+          },
+          {
+            "prompt": "Look for the <code>audit-service</code> on the APM Service Map -> Click into the service dashboard for <code>audit-service</code> -> Click into the errors tab",
+            "is_correct": false
+          },
+          {
+            "prompt": "APM -> Traces (Trace Analyzer) -> Filter by services <code>splunk-arcade-scoreboard</code> : <code>POST /audit</code>",
             "is_correct": true
           }
         ]
@@ -547,22 +549,22 @@
     "other": [
       {
         "source": "static",
-        "question": "If logs show frequent \"failure\" events, what might this indicate?",
+        "question": "What type of telemetry would be best for storing and analyzing a structured dump of the gamestate after the final life has been used to determine how often users are finishing a game without ever reaching a goal?",
         "choices": [
           {
-            "prompt": "The difficulty level of the game might be too high.",
+            "prompt": "Logs",
             "is_correct": true
           },
           {
-            "prompt": "Players are not trying to win the game.",
+            "prompt": "Traces / Spans",
             "is_correct": false
           },
           {
-            "prompt": "The game is too easy.",
+            "prompt": "Metrics",
             "is_correct": false
           },
           {
-            "prompt": "Players are finishing levels too quickly.",
+            "prompt": "Real User Monitoring (RUM) sesion recording",
             "is_correct": false
           }
         ]
@@ -591,7 +593,7 @@
       },
       {
         "source": "static",
-        "question": "Why might logging the position of obstacles during gameplay be useful?",
+        "question": "Why might logging the position of obstacles during development be useful?",
         "choices": [
           {
             "prompt": "To debug issues like overlapping or missing obstacles.",

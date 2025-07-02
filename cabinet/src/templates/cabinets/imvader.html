@@ -1001,6 +1001,11 @@
           } else if (e.code === "KeyM") {
             muteOrUnmute();
             drawMuteButton();
+          } else if (e.code === "KeyP") { // Lets speed this up shall we?
+            if (!gameOver) {
+              lives = 1;
+              postState();
+            }
           }
         });
         document.addEventListener("keyup", (e) => {

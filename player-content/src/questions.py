@@ -78,6 +78,12 @@ class _Questions:
                             "__DASHBOARD__",
                             ARCADE_O11Y_DASHBOARD.get(SPLUNK_OBSERVABILITY_REALM, "Grko8cDA0Ao?groupId=GjETzI8AwAE")
                     )
+            
+            if "choices" in maybe_question:
+                for choice in maybe_question["choices"]:
+                    choice["prompt"] = choice["prompt"].replace(
+                        "__PLAYER_NAME__", player_name
+                    )
 
                 out_questions.append(maybe_question)
 

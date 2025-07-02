@@ -323,7 +323,7 @@
                                 player_name: "{{ user_username }}",
                                 player_id: "{{ user_uuid }}",
                                 user_agent: navigator.userAgent,
-                                version: "v1.0",
+                                version: version,
                                 current_score: _score,
                                 level: _timesAtGoal,
                                 duration: gameDuration,
@@ -364,7 +364,7 @@
                                 player_name: "{{ user_username }}",
                                 player_id: "{{ user_uuid }}",
                                 user_agent: navigator.userAgent,
-                                version: "v1.0",
+                                version: version,
                                 current_score: _score,
                                 level: 5,
                                 duration: gameDuration,
@@ -389,6 +389,8 @@
 
                             // Decrease the number of lives the player has remaining
                             _lives--;
+                            
+                            getLoggerAd(curLives)
 
                             // cuz i dunno how to access frogger obj from other places and am lazy
                             curLives--;
@@ -414,7 +416,7 @@
                                 level: _timesAtGoal,
                                 duration: gameDuration,
                                 movement: _movementCount,
-                                version: "v1.0",
+                                version: version,
                                 message: "you killed a frog!",
                             };
                             console.log("loseLife dict:", dict);
@@ -498,7 +500,7 @@
                                     player_name: "{{ user_username }}",
                                     player_id: "{{ user_uuid }}",
                                     user_agent: navigator.userAgent,
-                                    version: "v1.0",
+                                    version: version,
                                     message: "hop hop hop",
                             };
 
@@ -521,7 +523,7 @@
                                     level: _timesAtGoal,
                                     duration: gameDuration,
                                     movement: _movementCount,
-                                    version: "v1.0"
+                                    version: version
                                 };
 
                                 $.ajax({
@@ -550,7 +552,7 @@
                                 player_name: "{{ user_username }}",
                                 player_id: "{{ user_uuid }}",
                                 user_agent: navigator.userAgent,
-                                version: "v1.0",
+                                version: version,
                                 message: "frog across!",
                                 duration: gameDuration,
                                 level: _timesAtGoal,
@@ -1150,6 +1152,21 @@
                             // Define a variable to store the initialized data from the game board module
                             // defined previously - this will be populated later with data from that module
                             _gameBoard = {};
+                        
+                        function renderVersion() {
+                            Frogger.drawingSurface.font = _font;
+
+                            // Right-align the text
+                            Frogger.drawingSurface.textAlign = "end";
+
+                            // Draw the "VERSION" label in white
+                            Frogger.drawingSurface.fillStyle = "#FFF";
+                            Frogger.drawingSurface.fillText("VERSION", Frogger.drawingSurfaceWidth - 20, _gameBoard.grid.height / 2);
+
+                            // Draw the actual version number below the label in red
+                            Frogger.drawingSurface.fillStyle = "#F00";
+                            Frogger.drawingSurface.fillText(version, Frogger.drawingSurfaceWidth - 20, _gameBoard.grid.height);
+                        }
 
                         // Define a function to render the player's score and high score to the <canvas> element
                         function renderScore() {
@@ -1246,6 +1263,7 @@
                         function render() {
                             renderScore();
                             renderTimeLabel();
+                            renderVersion();
 
                             // Only render the "GAME OVER" text if the game is actually over
                             if (_gameOver) {
@@ -2065,9 +2083,11 @@
                             if (event.keyCode === LEFT_ARROW) {
                               if (version === "1.5") {
                                 _movementCount += 10;
-
+                                
                                 if (_movementCount % 2 == 0) {
                                     move(Frogger.direction.LEFT);
+                                } else {
+                                    getLoggerAd(666)  // use the ad system for a popup feedback to user
                                 }
                               } else {
                                 move(Frogger.direction.LEFT);

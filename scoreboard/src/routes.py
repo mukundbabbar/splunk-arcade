@@ -1,5 +1,6 @@
 import hashlib
 import random
+import time
 
 from flask import Blueprint, abort, jsonify, request
 from opentelemetry import trace
@@ -230,9 +231,6 @@ def blackhole_sun():
         print(f"ignoring metrics exception: {e}")
 
     errors = [
-        (400, "Bad Request: Cosmic interference detected."),
-        (403, "Forbidden: You lack the necessary gravitation."),
-        (404, "Not Found: The sun has vanished into the void."),
         (500, "Internal Server Error: Singularity collapse imminent."),
         (503, "Service Unavailable: Black hole undergoing maintenance."),
     ]
@@ -241,8 +239,10 @@ def blackhole_sun():
     return jsonify(abort(code, description=message))
 
 
-@routes.route("/kerplunk", methods=["POST"])
+@routes.route("/kerplunkAds", methods=["POST"])
 def kerplunk():
+    version = request.args.get('version') or "unknown"
+
     content = request.get_json()
 
     current_span = trace.get_current_span()
@@ -264,20 +264,54 @@ def kerplunk():
         print(f"ignoring metrics exception: {e}")
 
     errors = [
-        (400, "Bad Request: Frog tried to cross before the light turned green."),
-        (401, "Unauthorized: Toad with no tokens detected."),
-        (403, "Forbidden: Hopper not cleared for this lane."),
-        (404, "Not Found: Frog missed the lily pad."),
-        (418, "I'm a Teapot: And also a flattened amphibian."),
-        (429, "Too Many Requests: The crosswalk is jammed with turtles."),
-        (500, "Internal Server Error: Frogger hit by a memory bus."),
-        (502, "Bad Gateway: Log drift caused route misalignment."),
-        (503, "Service Unavailable: Arcade machine took a coffee break."),
-        (504, "Gateway Timeout: Frog paused mid-hop. Unwise."),
+        (502, "Bad Ad Gateway: Log drift caused route misalignment."),
+        (503, "Ad Service Unavailable: Arcade machine took a coffee break."),
     ]
     code, message = random.choice(errors)
+    current_span.set_attribute("error.message", message)
+    current_span.set_attribute("version", version)
+    current_span.set_attribute("title", "logger")
 
-    return jsonify(abort(code, description=message))
+    print(code, message, version)
+
+    return abort(code, description=message)
+
+
+@routes.route("/audit", methods=["POST"])
+def moves():
+    content = request.get_json()
+
+    current_span = trace.get_current_span()
+    for k, v in content.items():
+        current_span.set_attribute(k, v)
+
+    scoreboard_update = {}
+
+    for k, v in content.items():
+        if isinstance(v, bool) or isinstance(v, list):
+            x = str(v)
+        else:
+            x = v
+        scoreboard_update[k] = x
+
+    time.sleep(random.uniform(1, 3)) ## ULTRA JANKY LATENCY
+
+    try:
+        metric_factory(name=scoreboard_update["title"]).process(game_data=scoreboard_update)
+    except Exception as e:
+        print(f"ignoring metrics exception: {e}")
+
+    errors = [
+        (429, "Too Many Requests: stored movements not received by /audit"),
+    ]
+    code, message = random.choice(errors)
+    current_span.set_attribute("error.message", message)
+    current_span.set_attribute("version", "1.5")
+    current_span.set_attribute("title", "logger")
+
+    print(code, message)
+
+    return abort(code, description=message)
 
 
 @routes.route("/record_question_thumbs_up_down", methods=["POST"])
