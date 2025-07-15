@@ -9,8 +9,8 @@ MAX_QUESTION_SELECTION_ATTEMPTS = 5
 # Currently us1 points to a dashboard in Show Playground.
 #!!!!!!! UPDATE THESE DASHBOARDS TO THE CORRECT ORGS ONCE DECIDED !!!!!!!!!
 ARCADE_O11Y_DASHBOARD = {
-    "us1":"Grko8cDA0Ao?groupId=GjETzI8AwAE&startTime=-1h&endTime=Now",
-    "eu0":"placeHolDeERid?groupId=PlAcEHoLDeRid",
+    "us1":"GvlHgXyAwBA?groupId=GvlBWCNA4A0&startTime=-1h&endTime=Now",
+    "eu0":"Gv5GIONAEBg?groupId=Gv5GIONAEAQ&startTime=-1h&endTime=Now",
 }
 
 
@@ -76,7 +76,7 @@ class _Questions:
                     )
                     maybe_question["link"] = maybe_question["link"].replace(
                             "__DASHBOARD__",
-                            ARCADE_O11Y_DASHBOARD.get(SPLUNK_OBSERVABILITY_REALM, "Grko8cDA0Ao?groupId=GjETzI8AwAE")
+                            ARCADE_O11Y_DASHBOARD.get(SPLUNK_OBSERVABILITY_REALM, "GvlHgXyAwBA?groupId=GvlBWCNA4A0")
                     )
             
             if "choices" in maybe_question:
