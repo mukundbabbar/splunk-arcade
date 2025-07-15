@@ -20,7 +20,7 @@ ARCADE_HOST = os.getenv("ARCADE_HOST")
 SCOREBOARD_HOST = os.getenv("SCOREBOARD_HOST")
 PLAYER_CONTENT_HOST = os.getenv("PLAYER_CONTENT_HOST")
 SPLUNK_OBSERVABILITY_REALM = os.getenv("SPLUNK_OBSERVABILITY_REALM", "us1")
-ARCADE_O11Y_DASHBOARD = {"us1":"Grko8cDA0Ao?groupId=GjETzI8AwAE&startTime=-1h&endTime=Now", "eu0":"placeHolDeERid?groupId=PlAcEHoLDeRid"}
+ARCADE_O11Y_DASHBOARD = {"us1":"GvlHgXyAwBA?groupId=GvlBWCNA4A0&startTime=-1h&endTime=Now", "eu0":"Gv5GIONAEBg?groupId=Gv5GIONAEAQ&startTime=-1h&endTime=Now"}
 
 
 IMVADERS_SLOW_VERSION = "0.75"
