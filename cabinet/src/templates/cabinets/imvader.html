@@ -180,7 +180,6 @@
         // Bullets
         const bullets = [];
         const enemyBullets = [];
-	let specialBullets = [];
         const bulletWidth = 3;
         const bulletHeight = 10;
         const bulletSpeed = 7;
@@ -615,7 +614,6 @@
               }
             }
           });
-
         }
 
         function drawScore(data) {
@@ -794,7 +792,6 @@
                     console.log("Projectile wall created! Eliminating player {{ user_username }}.")
         }
 
-	    
         function gameLoop(timestamp) {
           if (!shouldUpdate(timestamp)) {
             // skip this frame, but still queue the next one
@@ -896,10 +893,7 @@
                   spawnProjectileWall();
               }
           }
-
-
-
-
+			
           // Move player
           if (keys["ArrowLeft"] && player.x > 0) {
             player.x -= player.speed;
